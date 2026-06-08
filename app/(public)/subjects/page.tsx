@@ -1,0 +1,27 @@
+// D:\pasco-lab-portal\app\(public)\subjects\page.tsx
+import Link from 'next/link'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { pluralizeLabs } from '@/lib/content'
+import { getCurrentLocale } from '@/lib/locale-server'
+import { getLabs, getSubjects } from '@/lib/queries'
+import type { Lab, Subject } from '@/types'
+import { getPublicCopy } from '@/lib/i18n/public'
+
+export const revalidate = 60
+export const dynamic = 'force-dynamic'
+interface SubjectsPageProps { searchParams: Promise<{ subject?: string }> }
+
+export default async function SubjectsPage({ searchParams }: SubjectsPageProps) {
+  const locale = await getCurrentLocale()
+  const copy = getPublicCopy(locale, 'subjects')
+  const params = await searchParams
+  let subjects: Subject[] = [], labs: Lab[] = []
+  try { [subjects, labs] = await Promise.all([getSubjects(locale), getLabs({ locale })]) } catch (error) { console.error(error) }
+  const activeSubject = subjects.find(s => s.slug === params.subject)
+  if (activeSubject) {
+    const subjectLabs = labs.filter(lab => lab.subjects?.slug === activeSubject.slug)
+    return ( <div className="pb-20 pt-8"><section className="mx-auto w-[min(1180px,calc(100%-32px))] grid gap-6 lg:grid-cols-[340px_1fr]"><div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)] md:p-8"><Link href="/subjects" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-slate-950"><ArrowLeft size={16} />{copy.labsBySubject.back}</Link><div className="mt-6 flex flex-col items-center gap-4 text-center"><div className="text-6xl">{activeSubject.icon}</div><div><h1 className="text-2xl font-semibold tracking-[-0.05em] text-slate-950">{activeSubject.name}</h1><p className="mt-3 text-sm leading-6 text-slate-600">{subjectLabs.length} {pluralizeLabs(subjectLabs.length, locale)}</p></div></div>{subjectLabs.length > 0 && (<div className="mt-6 rounded-[24px] bg-blue-50 p-4 text-center"><div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#1647c5]">{locale === 'ky' ? 'Иштер саны' : 'Всего работ'}</div><div className="mt-2 text-3xl font-bold text-[#1647c5]">{subjectLabs.length}</div></div>)}</div><div>{subjectLabs.length === 0 ? <div className="rounded-[28px] border border-dashed border-slate-300 bg-slate-50 px-6 py-14 text-center text-slate-500">{copy.labsBySubject.empty}</div> : <div className="space-y-3">{subjectLabs.map(lab => (<Link key={lab.id} href={`/labs/${lab.slug}`} className="group block rounded-[20px] border border-slate-200 bg-white p-4 transition hover:border-blue-300 hover:bg-slate-50"><div className="flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><h3 className="font-semibold text-slate-950">{lab.title}</h3><div className="mt-2 flex flex-wrap gap-1.5">{lab.grades && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">{lab.grades.label}</span>}</div></div><ArrowRight size={16} className="flex-shrink-0 text-slate-400 transition group-hover:text-blue-500" /></div></Link>))}</div>}</div></section></div> )
+  }
+  const labCountBySubject = subjects.reduce((acc, subj) => { acc[subj.slug] = labs.filter(l => l.subjects?.slug === subj.slug).length; return acc }, {} as Record<string, number>)
+  return ( <div className="pb-20 pt-8"><section className="mx-auto w-[min(1180px,calc(100%-32px))] rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)] md:p-8"><div className="inline-flex rounded-full bg-blue-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#1647c5]">{copy.allSubjects.kicker}</div><h1 className="mt-5 max-w-4xl text-3xl font-semibold tracking-[-0.04em] text-slate-950 md:text-4xl">{copy.allSubjects.title}</h1><p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">{copy.allSubjects.intro}</p>{subjects.length === 0 ? <div className="mt-12 rounded-[28px] border border-dashed border-slate-300 bg-slate-50 px-6 py-14 text-center text-slate-500">{copy.allSubjects.empty}</div> : <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{subjects.map(subject => (<Link key={subject.id} href={`/subjects?subject=${subject.slug}`} className="group rounded-[30px] border border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] p-6 shadow-[0_16px_40px_rgba(15,23,42,0.05)] transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_22px_54px_rgba(15,23,42,0.1)]"><div className="flex items-start justify-between gap-4"><div className="flex h-16 w-16 items-center justify-center rounded-[22px] text-3xl" style={{ backgroundColor: `${subject.color ?? '#2563eb'}16` }}>{subject.icon}</div><div className="h-3 w-3 rounded-full" style={{ backgroundColor: subject.color ?? '#2563eb' }} /></div><div className="mt-6 text-2xl font-semibold tracking-[-0.03em] text-slate-950">{subject.name}</div><p className="mt-3 text-sm leading-7 text-slate-600">{labCountBySubject[subject.slug] || 0} {pluralizeLabs(labCountBySubject[subject.slug] || 0, locale)}</p><div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#1647c5] transition group-hover:gap-3">{copy.allSubjects.toLabs}<ArrowRight size={15} /></div></Link>))}</div>}</section></div> )
+}

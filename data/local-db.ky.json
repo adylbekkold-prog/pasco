@@ -1,0 +1,1205 @@
+{
+  "subjects": [
+    {
+      "id": "subject-physics",
+      "name": "Физика",
+      "slug": "physics",
+      "icon": "⚡",
+      "color": "#2b6fff",
+      "sort_order": 1
+    },
+    {
+      "id": "subject-chemistry",
+      "name": "Химия",
+      "slug": "chemistry",
+      "icon": "🧪",
+      "color": "#15b679",
+      "sort_order": 2
+    },
+    {
+      "id": "subject-biology",
+      "name": "Биология",
+      "slug": "biology",
+      "icon": "🧬",
+      "color": "#f0a229",
+      "sort_order": 3
+    }
+  ],
+  "grades": [
+    {
+      "id": "grade-7",
+      "level": 7,
+      "label": "7-класс"
+    },
+    {
+      "id": "grade-8",
+      "level": 8,
+      "label": "8-класс"
+    },
+    {
+      "id": "grade-9",
+      "level": 9,
+      "label": "9-класс"
+    },
+    {
+      "id": "grade-10",
+      "level": 10,
+      "label": "10-класс"
+    },
+    {
+      "id": "grade-11",
+      "level": 11,
+      "label": "11-класс"
+    },
+    {
+      "id": "grade-12",
+      "level": 12,
+      "label": "12-класс"
+    }
+  ],
+  "equipment": [
+    {
+      "id": "equipment-mechanics-kit",
+      "name": "Механика комплекти",
+      "slug": "mechanics-kit",
+      "subject_id": "subject-physics"
+    },
+    {
+      "id": "equipment-em-kit",
+      "name": "Электр жана магнетизм комплекти",
+      "slug": "em-kit",
+      "subject_id": "subject-physics"
+    },
+    {
+      "id": "equipment-optics-kit",
+      "name": "Оптика комплекти",
+      "slug": "optics-kit",
+      "subject_id": "subject-physics"
+    },
+    {
+      "id": "equipment-fluids-kit",
+      "name": "Суюктуктар комплекти",
+      "slug": "fluids-kit",
+      "subject_id": "subject-physics"
+    },
+    {
+      "id": "equipment-waves-kit",
+      "name": "Толкундар жана үн комплекти",
+      "slug": "waves-kit",
+      "subject_id": "subject-physics"
+    },
+    {
+      "id": "equipment-chem-starter",
+      "name": "Химия боюнча баштапкы комплект",
+      "slug": "chem-starter",
+      "subject_id": "subject-chemistry"
+    },
+    {
+      "id": "equipment-bio-starter",
+      "name": "Биология боюнча баштапкы комплект",
+      "slug": "bio-starter",
+      "subject_id": "subject-biology"
+    }
+  ],
+  "labs": [
+    {
+      "id": "b3247bb0-1c66-4263-ae54-d63a2f45a23b",
+      "slug": "izuchenie-zakona-oma-1774843125649",
+      "subject_id": "subject-physics",
+      "grade_id": "grade-8",
+      "duration_minutes": 45,
+      "difficulty": "beginner",
+      "is_published": true,
+      "created_at": "2026-03-30T03:58:46.915826+00:00",
+      "updated_at": "2026-04-03T08:10:00.000Z",
+      "thumbnail_url": null,
+      "title": "Ом мыйзамын изилдөө",
+      "topic": "Жөнөкөй электр чынжырындагы ток күчүн жана чыңалууну өлчөө",
+      "goal": "Ом мыйзамын тажрыйба аркылуу ырастоо жана чынжыр бөлүгүнүн каршылыгын эсептөөнү үйрөнүү.",
+      "expected_results": "Окуучулар электр чынжырын чогултуп, бир нече өлчөө жүргүзүп, ток күчү менен чыңалуунун байланышы тууралуу жыйынтык чыгарышат.",
+      "teacher_notes": "Ишти баштаар алдында электр коопсуздугунун эрежелерин эскертип, датчиктер туура туташканын текшериңиз.",
+      "equipment_ids": [
+        "equipment-em-kit"
+      ]
+    },
+    {
+      "id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "slug": "issledovanie-zavisimosti-sily-toka-ot-napryazheniya-1774863786299",
+      "subject_id": "subject-physics",
+      "grade_id": "grade-9",
+      "duration_minutes": 45,
+      "difficulty": "intermediate",
+      "is_published": true,
+      "created_at": "2026-03-30T09:43:07.351Z",
+      "updated_at": "2026-04-03T08:00:00.000Z",
+      "thumbnail_url": null,
+      "title": "Ток күчүнүн чыңалууга көз карандылыгын изилдөө",
+      "topic": "PASCO датчиктерин колдонуу менен Ом мыйзамы боюнча практикалык иш",
+      "goal": "Ток күчүнүн чыңалууга көз карандылыгын аныктап, эксперименттик маалыматтар аркылуу Ом мыйзамын ырастоо.",
+      "expected_results": "Окуучулар чынжырды чогултуп, датчиктердин көрсөткүчтөрүн жазып, өлчөөлөрдүн таблицасын түзүшөт жана график боюнча жыйынтык чыгарышат.",
+      "teacher_notes": "Датчиктердин уюлдуулугун текшерип, иш бүткөн соң топторго алынган графиктерди салыштырууну сунуштаңыз.",
+      "equipment_ids": [
+        "equipment-em-kit"
+      ]
+    },
+    {
+      "id": "5d6d8d20-1c7e-4d18-8ef6-4f78d0267c01",
+      "slug": "issledovanie-perioda-mayatnika-1775200000001",
+      "subject_id": "subject-physics",
+      "grade_id": "grade-9",
+      "duration_minutes": 40,
+      "difficulty": "intermediate",
+      "is_published": true,
+      "created_at": "2026-04-03T08:20:00.000Z",
+      "updated_at": "2026-04-03T08:20:00.000Z",
+      "thumbnail_url": null,
+      "title": "Математикалык маятниктин мезгилин изилдөө",
+      "topic": "Термелүү мезгилинин жип узундугуна көз карандылыгын аныктоо",
+      "goal": "Жиптин узундугу өзгөргөндө маятниктин мезгили кандай өзгөрөрүн аныктоо жана так өлчөө жүргүзүүнү үйрөнүү.",
+      "expected_results": "Окуучулар бир нече термелүүнүн убактысын өлчөп, мезгилди эсептеп, жиптин узундугу маятниктин кыймылына кандай таасир этерин түшүндүрүшөт.",
+      "teacher_notes": "Оодарылуу бурчу чоң болбошун көзөмөлдөп, жыйынтыктарды салыштыруу үчүн өлчөөнү бир нече жолу кайталатыңыз.",
+      "equipment_ids": [
+        "equipment-mechanics-kit"
+      ]
+    },
+    {
+      "id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d201",
+      "slug": "issledovanie-kislotnosti-rastvorov-1775200000002",
+      "subject_id": "subject-chemistry",
+      "grade_id": "grade-7",
+      "duration_minutes": 40,
+      "difficulty": "beginner",
+      "is_published": true,
+      "created_at": "2026-04-03T08:30:00.000Z",
+      "updated_at": "2026-04-03T08:30:00.000Z",
+      "thumbnail_url": null,
+      "title": "Эритмелердин кычкылдуулугун изилдөө",
+      "topic": "Турмуштук эритмелердин pH маанисин индикатор аркылуу аныктоо",
+      "goal": "Байкоо жыйынтыгы боюнча кычкыл, нейтралдуу жана щелочтуу чөйрөнү айырмалоону үйрөнүү.",
+      "expected_results": "Окуучулар бир нече эритмени салыштырып, алардын болжолдуу pH маанисин аныктап, топторго бөлүшөт.",
+      "teacher_notes": "Реактивдер менен иштөө эрежелерин эскертип, индикатордун түсү эмне үчүн өзгөрөрүн түшүндүртүп көрүңүз.",
+      "equipment_ids": [
+        "equipment-chem-starter"
+      ]
+    },
+    {
+      "id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d202",
+      "slug": "nablyudenie-priznakov-khimicheskoy-reaktsii-1775200000003",
+      "subject_id": "subject-chemistry",
+      "grade_id": "grade-8",
+      "duration_minutes": 45,
+      "difficulty": "beginner",
+      "is_published": true,
+      "created_at": "2026-04-03T08:40:00.000Z",
+      "updated_at": "2026-04-03T08:40:00.000Z",
+      "thumbnail_url": null,
+      "title": "Химиялык реакциянын белгилерин байкоо",
+      "topic": "Газ бөлүнүшүн, түстүн өзгөрүшүн жана чөкмөнүн пайда болушун аныктоо",
+      "goal": "Жөнөкөй тажрыйбалардын негизинде химиялык реакциянын негизги белгилерин таанууну үйрөнүү.",
+      "expected_results": "Окуучулар реакциянын белгилерин атап, заттар өзгөргөнүн кайсы байкоолор аркылуу билсе болорун түшүндүрүшөт.",
+      "teacher_notes": "Реактивдерди аз өлчөмдө колдонуп, химиялык жана физикалык өзгөрүүлөрдүн айырмасын өзүнчө талкуулаңыз.",
+      "equipment_ids": [
+        "equipment-chem-starter"
+      ]
+    },
+    {
+      "id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d203",
+      "slug": "issledovanie-skorosti-rastvoreniya-veshchestv-1775200000004",
+      "subject_id": "subject-chemistry",
+      "grade_id": "grade-8",
+      "duration_minutes": 45,
+      "difficulty": "intermediate",
+      "is_published": true,
+      "created_at": "2026-04-03T08:50:00.000Z",
+      "updated_at": "2026-04-03T08:50:00.000Z",
+      "thumbnail_url": null,
+      "title": "Заттардын эриш ылдамдыгын изилдөө",
+      "topic": "Температура жана аралаштыруу эриш ылдамдыгына кандай таасир этет",
+      "goal": "Суунун температурасы жана аралаштыруу катуу заттын эриш ылдамдыгына кандай таасир берерин түшүнүү.",
+      "expected_results": "Окуучулар эриштин ар кандай шарттарын салыштырып, эмне үчүн процесс ылдамдыгы өзгөрөрүн түшүндүрүшөт.",
+      "teacher_notes": "Өтө ысык сууну колдонбоңуз жана иштин алдында процесс ылдамдыгы деген түшүнүктү кыскача талкуулаңыз.",
+      "equipment_ids": [
+        "equipment-chem-starter"
+      ]
+    },
+    {
+      "id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4101",
+      "slug": "nablyudenie-kletok-epidermisa-luka-1775200000005",
+      "subject_id": "subject-biology",
+      "grade_id": "grade-7",
+      "duration_minutes": 40,
+      "difficulty": "beginner",
+      "is_published": true,
+      "created_at": "2026-04-03T09:00:00.000Z",
+      "updated_at": "2026-04-03T09:00:00.000Z",
+      "thumbnail_url": null,
+      "title": "Пияз эпидермисинин клеткаларын байкоо",
+      "topic": "Өсүмдүк клеткасынын түзүлүшүн микроскоп менен изилдөө",
+      "goal": "Жөнөкөй микропрепарат даярдоону жана өсүмдүк клеткасынын негизги бөлүктөрүн таанууну үйрөнүү.",
+      "expected_results": "Окуучулар клетка дубалын, ядрону жана вакуолду көрүп, пияз клеткаларынын өзгөчөлүктөрүн сүрөттөп бере алышат.",
+      "teacher_notes": "Пияздын жука кабыгын этият алуу жолун көрсөтүп, микроскоп менен иштөө эрежелерин эскертиңиз.",
+      "equipment_ids": [
+        "equipment-bio-starter"
+      ]
+    },
+    {
+      "id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4102",
+      "slug": "issledovanie-usloviy-prorastaniya-semyan-1775200000006",
+      "subject_id": "subject-biology",
+      "grade_id": "grade-8",
+      "duration_minutes": 45,
+      "difficulty": "intermediate",
+      "is_published": true,
+      "created_at": "2026-04-03T09:10:00.000Z",
+      "updated_at": "2026-04-03T09:10:00.000Z",
+      "thumbnail_url": null,
+      "title": "Уруктардын өнүү шарттарын изилдөө",
+      "topic": "Суу, аба жана температура өнүүгө кандай таасир этет",
+      "goal": "Уруктардын өнүп башташы үчүн кайсы шарттар зарыл экенин аныктоо.",
+      "expected_results": "Окуучулар тажрыйбанын бир нече вариантын салыштырып, өнүү үчүн кайсы факторлор милдеттүү экенин түшүндүрүшөт.",
+      "teacher_notes": "Сабактын аягында салыштыруу оңой болушу үчүн уруктардын бир нече топтомун алдын ала даярдап коюңуз.",
+      "equipment_ids": [
+        "equipment-bio-starter"
+      ]
+    },
+    {
+      "id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4103",
+      "slug": "izmerenie-chastoty-pulsa-posle-nagruzki-1775200000007",
+      "subject_id": "subject-biology",
+      "grade_id": "grade-9",
+      "duration_minutes": 35,
+      "difficulty": "beginner",
+      "is_published": true,
+      "created_at": "2026-04-03T09:20:00.000Z",
+      "updated_at": "2026-04-03T09:20:00.000Z",
+      "thumbnail_url": null,
+      "title": "Жүктөмдөн кийин пульстун жыштыгын өлчөө",
+      "topic": "Тынч абалдагы жана көнүгүүдөн кийинки пульсту салыштыруу",
+      "goal": "Физикалык жүктөм жүрөк-кан тамыр системасынын ишине кандай таасир этерин түшүнүү.",
+      "expected_results": "Окуучулар жүктөмгө чейин жана андан кийин пульсту өлчөп, жыйынтыктарды салыштырып, жүрөк кагышынын эмне үчүн өзгөргөнүн түшүндүрүшөт.",
+      "teacher_notes": "Класска ылайыктуу коопсуз жүктөм тандап, кыймыл учурунда организмге эмне үчүн көбүрөөк кычкылтек керек болорун талкуулаңыз.",
+      "equipment_ids": [
+        "equipment-bio-starter"
+      ]
+    },
+    {
+      "id": "2e3f4g55-96b2-5e37-bf3b-fdf8390f5104",
+      "slug": "analiz-elektromagnitnogo-spectra-1775200000008",
+      "subject_id": "subject-physics",
+      "grade_id": "grade-11",
+      "duration_minutes": 90,
+      "difficulty": "professional",
+      "is_published": true,
+      "created_at": "2026-04-03T09:30:00.000Z",
+      "updated_at": "2026-04-03T09:30:00.000Z",
+      "thumbnail_url": null,
+      "title": "Спектрофотометр менен электромагниттик спектрди анализ кылуу",
+      "topic": "Ар кандай заттар тарабынан жынын сиңиши",
+      "goal": "PASCO профессионалдык приборларын колдонуп, заттардын спектралдык мүнөздөмөсүн анализ кылып, максималдуу сиңиш толкун узундугун аныктоо.",
+      "expected_results": "Окуучулар ар кандай заттар үчүн сиңиш ийрилерин курушуп, спектралдык максимумдарды аныктап, байкалган явлалардын молекулярдык негиздерин түшүндүрүшөт.",
+      "teacher_notes": "PASCO спектрофотометри жана квант физикасынын негиздеген билимди талап кылат. Сиңиш лентасынын теориясын алдын ала талкуулоо сунушталат.",
+      "equipment_ids": [
+        "equipment-em-kit"
+      ]
+    },
+    {
+      "id": "3f4g5h66-a7c3-6f48-cg4c-geg9401g6105",
+      "slug": "issledovanie-svoystv-elektrolita-1775200000009",
+      "subject_id": "subject-chemistry",
+      "grade_id": "grade-10",
+      "duration_minutes": 90,
+      "difficulty": "professional",
+      "is_published": true,
+      "created_at": "2026-04-03T09:40:00.000Z",
+      "updated_at": "2026-04-03T09:40:00.000Z",
+      "thumbnail_url": null,
+      "title": "Электролиттер жана эритмелердин өткөрүмдүүлүгүнүн касиеттерин изилдөө",
+      "topic": "Диссоциация деңгээлүнө жана иондук күчүнө аныктоо",
+      "goal": "Ар кандай эритмелердин электр өткөрүмдүүлүгүнө өлчөп, концентрацияга жана заттын табиятына көз карандылыгын белгилөө.",
+      "expected_results": "Окуучулар диссоциация константасын аныктап, эритмелердин коллигативдик касиеттерин түшүндүрүп, өлчөө тактыгын жакшыртуу ыкмаларын сунуштап беришөт.",
+      "teacher_notes": "Өткөрүмдүүлүктү өлчөө куралдары зарыл. Ионтордун активдүүлүгү түшүнүгүнө тааныш болуу сунушталат.",
+      "equipment_ids": [
+        "equipment-chem-starter"
+      ]
+    },
+    {
+      "id": "4g5h6i77-b8d4-7g59-dh5d-hfh0512h7106",
+      "slug": "modelirovanie-evoljucii-populyacii-1775200000010",
+      "subject_id": "subject-biology",
+      "grade_id": "grade-11",
+      "duration_minutes": 120,
+      "difficulty": "professional",
+      "is_published": true,
+      "created_at": "2026-04-03T09:50:00.000Z",
+      "updated_at": "2026-04-03T09:50:00.000Z",
+      "thumbnail_url": null,
+      "title": "Маалыматтарды колдонуп популяция эволюциясын моделдөө",
+      "topic": "Популяция динамикасына математикалык модельдерди колдонуу",
+      "goal": "Экспериментальдык маалыматтарга негиздеп, популяциянын өсүшүнүн жана туруктуулаштырылуунун математикалык моделин түзүп, анализ кылуу.",
+      "expected_results": "Окуучулар Lotka-Volterra теңдемелерин колдонуп, сезгичтик анализ жүргүзүп, моделдөөнүн экологиялык колдонулуштарын талкуулашпат.",
+      "teacher_notes": "Электрондук таблицалар же Python менен иштөө능ча талап кылат. Дифференциалдык теңдемелерге чейинки тааныкташуу ыктыярдуу.",
+      "equipment_ids": [
+        "equipment-bio-starter"
+      ]
+    }
+  ],
+  "lab_steps": [
+    {
+      "id": "step-oma-1",
+      "lab_id": "b3247bb0-1c66-4263-ae54-d63a2f45a23b",
+      "step_order": 1,
+      "block_type": "text",
+      "content": "Булактан, резистордон, PASCO ток датчигинен жана чыңалуу датчигинен жөнөкөй электр чынжырын чогулткула.",
+      "caption": null
+    },
+    {
+      "id": "step-oma-2",
+      "lab_id": "b3247bb0-1c66-4263-ae54-d63a2f45a23b",
+      "step_order": 2,
+      "block_type": "text",
+      "content": "Булактын чыңалуусун этап-этабы менен өзгөртүп, ар бир мааниге ылайык ток күчүн байкоо таблицасына жазгыла.",
+      "caption": null
+    },
+    {
+      "id": "step-oma-3",
+      "lab_id": "b3247bb0-1c66-4263-ae54-d63a2f45a23b",
+      "step_order": 3,
+      "block_type": "text",
+      "content": "Ток күчүнүн чыңалууга көз карандылык графигин түзүп, изилденген чынжыр бөлүгүнүн каршылыгын эсептегиле.",
+      "caption": null
+    },
+    {
+      "id": "step-7c8d0991-88a5-49ec-bc5b-ad464b4f4b60",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "step_order": 1,
+      "block_type": "text",
+      "content": "Булактан, резистордон, ток датчигинен жана чыңалуу датчигинен электр чынжырын чогулткула. Чыңалуунун эң төмөн маанисин коюп, алгачкы көрсөткүчтөрдү жазгыла.",
+      "caption": null
+    },
+    {
+      "id": "step-fe973288-fe10-4b3e-9ee8-886143a4f237",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "step_order": 2,
+      "block_type": "image",
+      "content": "/uploads/labs/draft-4413fb57-512d-4201-be7b-cb98a47b136c/shema-dejstvuyushayapage-0001-1774863766737.jpg",
+      "caption": "Электр чынжырынын схемасы"
+    },
+    {
+      "id": "step-c86c9f92-f2b4-4da7-8987-e4ee67d111f1",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "step_order": 3,
+      "block_type": "video",
+      "content": "https://www.youtube.com/watch?v=Q20TbdD02kY",
+      "caption": "Электр чынжырлары тууралуу видео"
+    },
+    {
+      "id": "step-pendulum-1",
+      "lab_id": "5d6d8d20-1c7e-4d18-8ef6-4f78d0267c01",
+      "step_order": 1,
+      "block_type": "text",
+      "content": "Штативге маятник орнотуп, жиптин узундугун асылуу чекитинен жүктүн борборуна чейин өлчөгүлө.",
+      "caption": null
+    },
+    {
+      "id": "step-pendulum-2",
+      "lab_id": "5d6d8d20-1c7e-4d18-8ef6-4f78d0267c01",
+      "step_order": 2,
+      "block_type": "text",
+      "content": "Жүктү кичине бурчка четтетип, он термелүүнүн убактысын өлчөгүлө жана тажрыйбаны жиптин бир нече узундугу үчүн кайталагыла.",
+      "caption": null
+    },
+    {
+      "id": "step-pendulum-3",
+      "lab_id": "5d6d8d20-1c7e-4d18-8ef6-4f78d0267c01",
+      "step_order": 3,
+      "block_type": "text",
+      "content": "Бир термелүүнүн мезгилин эсептеп, таблица түзгүлө жана жиптин узундугу мезгилге кандай таасир берерин түшүндүргүлө.",
+      "caption": null
+    },
+    {
+      "id": "step-ph-1",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d201",
+      "step_order": 1,
+      "block_type": "text",
+      "content": "Бир нече эритмени пробиркага куюп, байкоону баштар алдында ар бирин белгилегиле.",
+      "caption": null
+    },
+    {
+      "id": "step-ph-2",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d201",
+      "step_order": 2,
+      "block_type": "text",
+      "content": "Ар бир үлгүгө индикатор кошуп, алынган түстү pH шкаласы менен салыштыргыла.",
+      "caption": null
+    },
+    {
+      "id": "step-ph-3",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d201",
+      "step_order": 3,
+      "block_type": "text",
+      "content": "Жыйынтыктарды таблицага жазып, ар бир эритменин кычкылдуулугу боюнча корутунду чыгаргыла.",
+      "caption": null
+    },
+    {
+      "id": "step-reaction-1",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d202",
+      "step_order": 1,
+      "block_type": "text",
+      "content": "Эки жөнөкөй тажрыйбаны даярдагыла: уксусту сода менен аралаштыруу жана коопсуз туз эритмелеринин өз ара аракеттениши.",
+      "caption": null
+    },
+    {
+      "id": "step-reaction-2",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d202",
+      "step_order": 2,
+      "block_type": "text",
+      "content": "Түстүн өзгөрүшүн, көбүктүн чыгышын жана чөкмөнүн пайда болушун байкап, бардык белгилерди жазгыла.",
+      "caption": null
+    },
+    {
+      "id": "step-reaction-3",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d202",
+      "step_order": 3,
+      "block_type": "text",
+      "content": "Тажрыйбалардын жыйынтыгын салыштырып, кайсы байкоолор химиялык реакция жүргөнүн далилдей турганын түшүндүргүлө.",
+      "caption": null
+    },
+    {
+      "id": "step-dissolve-1",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d203",
+      "step_order": 1,
+      "block_type": "text",
+      "content": "Температурасы ар башка болгон үч стакан сууга эриүүчү заттын бирдей өлчөмүн салыгыла.",
+      "caption": null
+    },
+    {
+      "id": "step-dissolve-2",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d203",
+      "step_order": 2,
+      "block_type": "text",
+      "content": "Бир учурда эритмени аралаштырып, экинчисинде аралаштырбай эриш процессин байкагыла.",
+      "caption": null
+    },
+    {
+      "id": "step-dissolve-3",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d203",
+      "step_order": 3,
+      "block_type": "text",
+      "content": "Эриш убактысын салыштырып, температура менен аралаштыруунун таасири тууралуу жыйынтык чыгаргыла.",
+      "caption": null
+    },
+    {
+      "id": "step-onion-1",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4101",
+      "step_order": 1,
+      "block_type": "text",
+      "content": "Пияз кабыгынын ички тарабынан жука катмарды алып, аны предметтик айнекке жайгаштыргыла.",
+      "caption": null
+    },
+    {
+      "id": "step-onion-2",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4101",
+      "step_order": 2,
+      "block_type": "text",
+      "content": "Бир тамчы суу же боёк кошуп, үстүн жаап айнек менен жаап, микроскопту тууралагыла.",
+      "caption": null
+    },
+    {
+      "id": "step-onion-3",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4101",
+      "step_order": 3,
+      "block_type": "text",
+      "content": "Клеткаларды байкап, көргөнүңөрдү сүрөткө же сүрөттөмөгө түшүрүп, негизги түзүлүштөрүн белгилегиле.",
+      "caption": null
+    },
+    {
+      "id": "step-seed-1",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4102",
+      "step_order": 1,
+      "block_type": "text",
+      "content": "Уруктарды ар башка шарттарга жайгаштыргыла: суу менен, суусуз, жылуу жерде жана төмөн температурада.",
+      "caption": null
+    },
+    {
+      "id": "step-seed-2",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4102",
+      "step_order": 2,
+      "block_type": "text",
+      "content": "Күн сайын байкап, тамырчанын жана өсүндүнүн пайда болушун белгилеп тургула.",
+      "caption": null
+    },
+    {
+      "id": "step-seed-3",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4102",
+      "step_order": 3,
+      "block_type": "text",
+      "content": "Бардык үлгүлөрдүн жыйынтыгын салыштырып, өнүү үчүн зарыл шарттар тууралуу корутунду чыгаргыла.",
+      "caption": null
+    },
+    {
+      "id": "step-pulse-1",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4103",
+      "step_order": 1,
+      "block_type": "text",
+      "content": "Тынч абалда 30 секунд ичинде пульсту өлчөп, жыйынтыкты таблицага жазыңыз.",
+      "caption": null
+    },
+    {
+      "id": "step-pulse-2",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4103",
+      "step_order": 2,
+      "block_type": "text",
+      "content": "Кыска физикалык көнүгүү жасап, 20 секунддан кийин пульсту кайра өлчөгүлө.",
+      "caption": null
+    },
+    {
+      "id": "step-pulse-3",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4103",
+      "step_order": 3,
+      "block_type": "text",
+      "content": "Эки маанини салыштырып, жүктөмдөн кийин пульстун эмне үчүн өзгөргөнүн түшүндүргүлө.",
+      "caption": null
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-oma-link",
+      "lab_id": "b3247bb0-1c66-4263-ae54-d63a2f45a23b",
+      "resource_type": "link",
+      "title": "Электр чынжырынын интерактивдүү модели",
+      "url": "https://phet.colorado.edu/sims/html/circuit-construction-kit-dc/latest/circuit-construction-kit-dc_all.html",
+      "file_size": null,
+      "sort_order": 0
+    },
+    {
+      "id": "resource-d9df5582-cac4-4fa1-9d0b-dce1eeba71fd",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "resource_type": "pdf",
+      "title": "Лабораториялык иштин нускамасы",
+      "url": "/uploads/labs/draft-4413fb57-512d-4201-be7b-cb98a47b136c/img0001-1774863748025.pdf",
+      "file_size": 2435694,
+      "sort_order": 0
+    },
+    {
+      "id": "resource-pendulum-link",
+      "lab_id": "5d6d8d20-1c7e-4d18-8ef6-4f78d0267c01",
+      "resource_type": "link",
+      "title": "Маятниктин виртуалдык лабораториясы",
+      "url": "https://phet.colorado.edu/sims/html/pendulum-lab/latest/pendulum-lab_all.html",
+      "file_size": null,
+      "sort_order": 0
+    },
+    {
+      "id": "resource-ph-link",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d201",
+      "resource_type": "link",
+      "title": "pH шкаласынын интерактивдүү модели",
+      "url": "https://phet.colorado.edu/sims/html/ph-scale/latest/ph-scale_all.html",
+      "file_size": null,
+      "sort_order": 0
+    },
+    {
+      "id": "resource-reaction-link",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d202",
+      "resource_type": "link",
+      "title": "Реакциядагы реагенттер жана продукттар модели",
+      "url": "https://phet.colorado.edu/sims/html/reactants-products-and-leftovers/latest/reactants-products-and-leftovers_all.html",
+      "file_size": null,
+      "sort_order": 0
+    },
+    {
+      "id": "resource-dissolve-link",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d203",
+      "resource_type": "link",
+      "title": "Кант жана туз эритмелеринин модели",
+      "url": "https://phet.colorado.edu/sims/html/sugar-and-salt-solutions/latest/sugar-and-salt-solutions_all.html",
+      "file_size": null,
+      "sort_order": 0
+    },
+    {
+      "id": "resource-d6ec233d-2c7a-47c7-9cb8-09bc7231de3e",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "resource_type": "image",
+      "title": "Электр чынжырынын схемасы",
+      "url": "/uploads/labs/draft-4413fb57-512d-4201-be7b-cb98a47b136c/shema-dejstvuyushayapage-0001-1774863766737.jpg",
+      "file_size": 779831,
+      "sort_order": 1
+    },
+    {
+      "id": "resource-b0384141-13a0-4bff-84df-9b8b88511f10",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "resource_type": "video",
+      "title": "Видео: туруктуу жана өзгөрмө ток",
+      "url": "/uploads/labs/draft-4413fb57-512d-4201-be7b-cb98a47b136c/3-direct-currentdc-vs-alternating-currentac-1774863778488.mp4",
+      "file_size": 82181040,
+      "sort_order": 2
+    },
+    {
+      "id": "resource-6db7b12b-fd3a-47d3-a33f-d7dc4f983652",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "resource_type": "worksheet",
+      "title": "Жумуш барагы",
+      "url": "/uploads/labs/draft-4413fb57-512d-4201-be7b-cb98a47b136c/kp-54-shkoly-1774863743407.pdf",
+      "file_size": 206948,
+      "sort_order": 3
+    }
+  ],
+  "lab_equipment_items": [
+    {
+      "id": "840b574c-28dd-460d-9e98-c1bc613aea14",
+      "lab_id": "b3247bb0-1c66-4263-ae54-d63a2f45a23b",
+      "item_name": "Электр булагы",
+      "quantity": 1,
+      "notes": "Жөнгө салынуучу, 12 В чейин",
+      "sort_order": 0
+    },
+    {
+      "id": "item-oma-2",
+      "lab_id": "b3247bb0-1c66-4263-ae54-d63a2f45a23b",
+      "item_name": "10 Ом резистор",
+      "quantity": 1,
+      "notes": "Ысып кетпеген, жарактуу",
+      "sort_order": 1
+    },
+    {
+      "id": "item-oma-3",
+      "lab_id": "b3247bb0-1c66-4263-ae54-d63a2f45a23b",
+      "item_name": "PASCO ток датчиги",
+      "quantity": 1,
+      "notes": "Ток күчүн өлчөө үчүн",
+      "sort_order": 2
+    },
+    {
+      "id": "item-oma-4",
+      "lab_id": "b3247bb0-1c66-4263-ae54-d63a2f45a23b",
+      "item_name": "PASCO чыңалуу датчиги",
+      "quantity": 1,
+      "notes": "Резистордогу чыңалууну өлчөө үчүн",
+      "sort_order": 3
+    },
+    {
+      "id": "item-current-1",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "item_name": "Электр булагы",
+      "quantity": 1,
+      "notes": "Жөнгө салынуучу, 12 В чейин",
+      "sort_order": 0
+    },
+    {
+      "id": "item-current-2",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "item_name": "10 Ом резистор",
+      "quantity": 1,
+      "notes": "Өлчөө үчүн чынжыр жүгү",
+      "sort_order": 1
+    },
+    {
+      "id": "item-current-3",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "item_name": "PASCO ток датчиги",
+      "quantity": 1,
+      "notes": "Тизмектей туташтырылат",
+      "sort_order": 2
+    },
+    {
+      "id": "item-current-4",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "item_name": "PASCO чыңалуу датчиги",
+      "quantity": 1,
+      "notes": "Резисторго параллель туташтырылат",
+      "sort_order": 3
+    },
+    {
+      "id": "item-current-5",
+      "lab_id": "1f473456-6b00-4aea-9734-9c000883d817",
+      "item_name": "Компьютер же планшет",
+      "quantity": 1,
+      "notes": "PASCO Capstone же SPARKvue үчүн",
+      "sort_order": 4
+    },
+    {
+      "id": "item-pendulum-1",
+      "lab_id": "5d6d8d20-1c7e-4d18-8ef6-4f78d0267c01",
+      "item_name": "Штатив",
+      "quantity": 1,
+      "notes": "Жипти бекитүү үчүн",
+      "sort_order": 0
+    },
+    {
+      "id": "item-pendulum-2",
+      "lab_id": "5d6d8d20-1c7e-4d18-8ef6-4f78d0267c01",
+      "item_name": "Жүк тагылган жип",
+      "quantity": 1,
+      "notes": "Изилденүүчү маятник",
+      "sort_order": 1
+    },
+    {
+      "id": "item-pendulum-3",
+      "lab_id": "5d6d8d20-1c7e-4d18-8ef6-4f78d0267c01",
+      "item_name": "Секундомер",
+      "quantity": 1,
+      "notes": "Термелүү убактысын өлчөө үчүн",
+      "sort_order": 2
+    },
+    {
+      "id": "item-pendulum-4",
+      "lab_id": "5d6d8d20-1c7e-4d18-8ef6-4f78d0267c01",
+      "item_name": "Сызгыч",
+      "quantity": 1,
+      "notes": "Жиптин узундугун өлчөө үчүн",
+      "sort_order": 3
+    },
+    {
+      "id": "item-ph-1",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d201",
+      "item_name": "Пробиркалар",
+      "quantity": 3,
+      "notes": "Ар түрдүү эритмелер үчүн",
+      "sort_order": 0
+    },
+    {
+      "id": "item-ph-2",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d201",
+      "item_name": "Универсалдуу индикатор",
+      "quantity": 1,
+      "notes": "pH аныктоо үчүн",
+      "sort_order": 1
+    },
+    {
+      "id": "item-ph-3",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d201",
+      "item_name": "Кагаз барагы",
+      "quantity": 1,
+      "notes": "Маалыматты жазуу үчүн",
+      "sort_order": 2
+    },
+    {
+      "id": "item-ph-4",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d201",
+      "item_name": "Турмуштук эритмелер топтому",
+      "quantity": 1,
+      "notes": "Талдоо үчүн үлгүлөр",
+      "sort_order": 3
+    },
+    {
+      "id": "item-reaction-1",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d202",
+      "item_name": "Пробиркалар",
+      "quantity": 4,
+      "notes": "Тажрыйба жүргүзүү үчүн",
+      "sort_order": 0
+    },
+    {
+      "id": "item-reaction-2",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d202",
+      "item_name": "Уксус",
+      "quantity": 1,
+      "notes": "Сода менен реакция үчүн",
+      "sort_order": 1
+    },
+    {
+      "id": "item-reaction-3",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d202",
+      "item_name": "Сода",
+      "quantity": 1,
+      "notes": "Аз өлчөмдө",
+      "sort_order": 2
+    },
+    {
+      "id": "item-reaction-4",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d202",
+      "item_name": "Пипеткалар",
+      "quantity": 2,
+      "notes": "Так өлчөп куюу үчүн",
+      "sort_order": 3
+    },
+    {
+      "id": "item-dissolve-1",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d203",
+      "item_name": "Стакандар",
+      "quantity": 3,
+      "notes": "Ар башка температурадагы суу үчүн",
+      "sort_order": 0
+    },
+    {
+      "id": "item-dissolve-2",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d203",
+      "item_name": "Туз же кант",
+      "quantity": 1,
+      "notes": "Эриүүчү зат",
+      "sort_order": 1
+    },
+    {
+      "id": "item-dissolve-3",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d203",
+      "item_name": "Аралаштыруучу кашык",
+      "quantity": 1,
+      "notes": "Тажрыйба үчүн",
+      "sort_order": 2
+    },
+    {
+      "id": "item-dissolve-4",
+      "lab_id": "7c8420f1-5a4b-4d7e-93f0-0d438a85d203",
+      "item_name": "Термометр",
+      "quantity": 1,
+      "notes": "Суунун температурасын көзөмөлдөө үчүн",
+      "sort_order": 3
+    },
+    {
+      "id": "item-onion-1",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4101",
+      "item_name": "Микроскоп",
+      "quantity": 1,
+      "notes": "Клеткаларды байкоо үчүн",
+      "sort_order": 0
+    },
+    {
+      "id": "item-onion-2",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4101",
+      "item_name": "Предметтик жана жабуучу айнек",
+      "quantity": 1,
+      "notes": "Препарат даярдоо үчүн",
+      "sort_order": 1
+    },
+    {
+      "id": "item-onion-3",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4101",
+      "item_name": "Пияз башы",
+      "quantity": 1,
+      "notes": "Ткань үлгүсү",
+      "sort_order": 2
+    },
+    {
+      "id": "item-onion-4",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4101",
+      "item_name": "Пинцет",
+      "quantity": 1,
+      "notes": "Жука кабыкты алуу үчүн",
+      "sort_order": 3
+    },
+    {
+      "id": "item-seed-1",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4102",
+      "item_name": "Буурчак же төө буурчак уруктары",
+      "quantity": 1,
+      "notes": "Байкоо жүргүзүү үчүн",
+      "sort_order": 0
+    },
+    {
+      "id": "item-seed-2",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4102",
+      "item_name": "Петри чөйчөктөрү",
+      "quantity": 3,
+      "notes": "Ар башка шарттар үчүн",
+      "sort_order": 1
+    },
+    {
+      "id": "item-seed-3",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4102",
+      "item_name": "Салфеткалар",
+      "quantity": 3,
+      "notes": "Уруктарды нымдоо үчүн",
+      "sort_order": 2
+    },
+    {
+      "id": "item-seed-4",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4102",
+      "item_name": "Суу",
+      "quantity": 1,
+      "notes": "Нымдуу чөйрө түзүү үчүн",
+      "sort_order": 3
+    },
+    {
+      "id": "item-pulse-1",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4103",
+      "item_name": "Секундомер",
+      "quantity": 1,
+      "notes": "Убакыт өлчөө үчүн",
+      "sort_order": 0
+    },
+    {
+      "id": "item-pulse-2",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4103",
+      "item_name": "Байкоо таблицасы",
+      "quantity": 1,
+      "notes": "Жыйынтыктарды жазуу үчүн",
+      "sort_order": 1
+    },
+    {
+      "id": "item-pulse-3",
+      "lab_id": "1d2b3c44-85f1-4d26-ae2a-ecf7289f4103",
+      "item_name": "Карандаш",
+      "quantity": 1,
+      "notes": "Таблицаны толтуруу үчүн",
+      "sort_order": 2
+    }
+  ],
+  "pasco_kits": [
+    {
+      "id": "pasco-kit-1",
+      "name": "Механика комплекти",
+      "slug": "pasco-mechanics",
+      "description": "Механика жана кыймылдын негиздерин изилдөө үчүн толук комплект",
+      "thumbnail_url": null,
+      "subject_id": "subject-physics",
+      "sort_order": 1,
+      "created_at": "2026-04-30T03:37:20.007Z",
+      "updated_at": "2026-04-30T03:37:20.007Z"
+    },
+    {
+      "id": "pasco-kit-2",
+      "name": "Электр жана магнетизм комплекти",
+      "slug": "pasco-em",
+      "description": "Электр, магнит талаалары жана электромагнетизм менен экспериментдер үчүн",
+      "thumbnail_url": null,
+      "subject_id": "subject-physics",
+      "sort_order": 2,
+      "created_at": "2026-04-30T03:37:20.007Z",
+      "updated_at": "2026-04-30T03:37:20.007Z"
+    },
+    {
+      "id": "pasco-kit-3",
+      "name": "Оптика жана жарык комплекти",
+      "slug": "pasco-optics",
+      "description": "Жарыктын касиеттерин, линзаларын жана айнектарын изилдөө үчүн",
+      "thumbnail_url": null,
+      "subject_id": "subject-physics",
+      "sort_order": 3,
+      "created_at": "2026-04-30T03:37:20.007Z",
+      "updated_at": "2026-04-30T03:37:20.007Z"
+    },
+    {
+      "id": "pasco-kit-4",
+      "name": "Толкундар жана акустика комплекти",
+      "slug": "pasco-waves",
+      "description": "Толкун кубулушун, үнүн жана колебанияларды изилдөө үчүн",
+      "thumbnail_url": null,
+      "subject_id": "subject-physics",
+      "sort_order": 4,
+      "created_at": "2026-04-30T03:37:20.007Z",
+      "updated_at": "2026-04-30T03:37:20.007Z"
+    },
+    {
+      "id": "pasco-kit-5",
+      "name": "Гидродинамика комплекти",
+      "slug": "pasco-fluids",
+      "description": "Суюктуктардын касиеттерин жана гидравликасын изилдөө үчүн",
+      "thumbnail_url": null,
+      "subject_id": "subject-physics",
+      "sort_order": 5,
+      "created_at": "2026-04-30T03:37:20.007Z",
+      "updated_at": "2026-04-30T03:37:20.007Z"
+    },
+    {
+      "id": "pasco-kit-6",
+      "name": "Химия боюнча баштапкы комплект",
+      "slug": "pasco-chemistry",
+      "description": "Коопсуз химиялык экспериментдерди жүргүзүү үчүн базалык комплект",
+      "thumbnail_url": null,
+      "subject_id": "subject-chemistry",
+      "sort_order": 6,
+      "created_at": "2026-04-30T03:37:20.007Z",
+      "updated_at": "2026-04-30T03:37:20.007Z"
+    },
+    {
+      "id": "pasco-kit-7",
+      "name": "Биология боюнча баштапкы комплект",
+      "slug": "pasco-biology",
+      "description": "Микробиологиялык жана биологиялык изилдөөлөр үчүн жабдуу",
+      "thumbnail_url": null,
+      "subject_id": "subject-biology",
+      "sort_order": 7,
+      "created_at": "2026-04-30T03:37:20.007Z",
+      "updated_at": "2026-04-30T03:37:20.007Z"
+    }
+  ],
+  "pasco_kit_components": [
+    {
+      "id": "comp-mech-1",
+      "kit_id": "pasco-kit-1",
+      "name": "Динамометр 5Н",
+      "quantity": 2,
+      "photo_url": null,
+      "description": "Измеритель силы до 5 Ньютонов",
+      "storage_location": "Box 1",
+      "notes": "Требует бережного обращения",
+      "sort_order": 1
+    },
+    {
+      "id": "comp-mech-2",
+      "kit_id": "pasco-kit-1",
+      "name": "Линейка метровая",
+      "quantity": 3,
+      "photo_url": null,
+      "description": "Для измерения расстояний",
+      "storage_location": "Box 1",
+      "notes": null,
+      "sort_order": 2
+    },
+    {
+      "id": "comp-mech-3",
+      "kit_id": "pasco-kit-1",
+      "name": "Секундомер спортивный",
+      "quantity": 2,
+      "photo_url": null,
+      "description": "Для измерения временных интервалов",
+      "storage_location": "Box 1",
+      "notes": "Батарея 1.5V AAA",
+      "sort_order": 3
+    },
+    {
+      "id": "comp-mech-4",
+      "kit_id": "pasco-kit-1",
+      "name": "Тележка с датчиком",
+      "quantity": 2,
+      "photo_url": null,
+      "description": "Беспроводная тележка для измерения скорости",
+      "storage_location": "Box 2",
+      "notes": "Полностью заряжена",
+      "sort_order": 4
+    },
+    {
+      "id": "comp-mech-5",
+      "kit_id": "pasco-kit-1",
+      "name": "Наклонная плоскость",
+      "quantity": 1,
+      "photo_url": null,
+      "description": "Регулируемый угол от 0° до 45°",
+      "storage_location": "Box 2",
+      "notes": null,
+      "sort_order": 5
+    },
+    {
+      "id": "comp-em-1",
+      "kit_id": "pasco-kit-2",
+      "name": "Источник питания регулируемый",
+      "quantity": 2,
+      "photo_url": null,
+      "description": "Переменное напряжение 0-12V",
+      "storage_location": "Box 3",
+      "notes": "Требует розетки 220V",
+      "sort_order": 1
+    },
+    {
+      "id": "comp-em-2",
+      "kit_id": "pasco-kit-2",
+      "name": "Датчик тока PASCO",
+      "quantity": 3,
+      "photo_url": null,
+      "description": "Для измерения силы тока",
+      "storage_location": "Box 3",
+      "notes": "Беспроводной",
+      "sort_order": 2
+    },
+    {
+      "id": "comp-em-3",
+      "kit_id": "pasco-kit-2",
+      "name": "Датчик напряжения PASCO",
+      "quantity": 3,
+      "photo_url": null,
+      "description": "Для измерения напряжения",
+      "storage_location": "Box 3",
+      "notes": "Беспроводной",
+      "sort_order": 3
+    },
+    {
+      "id": "comp-em-4",
+      "kit_id": "pasco-kit-2",
+      "name": "Резисторы ассортимент",
+      "quantity": 30,
+      "photo_url": null,
+      "description": "Различные значения сопротивления",
+      "storage_location": "Box 4",
+      "notes": null,
+      "sort_order": 4
+    },
+    {
+      "id": "comp-em-5",
+      "kit_id": "pasco-kit-2",
+      "name": "Провода соединительные",
+      "quantity": 50,
+      "photo_url": null,
+      "description": "С зажимами для соединения элементов цепи",
+      "storage_location": "Box 4",
+      "notes": null,
+      "sort_order": 5
+    },
+    {
+      "id": "comp-opt-1",
+      "kit_id": "pasco-kit-3",
+      "name": "Лазер гелий-неон",
+      "quantity": 1,
+      "photo_url": null,
+      "description": "Красный лазер 5mW",
+      "storage_location": "Box 5",
+      "notes": "Опасно для глаз! Требует защитных очков",
+      "sort_order": 1
+    },
+    {
+      "id": "comp-opt-2",
+      "kit_id": "pasco-kit-3",
+      "name": "Линза собирающая",
+      "quantity": 5,
+      "photo_url": null,
+      "description": "Различные фокусные расстояния",
+      "storage_location": "Box 5",
+      "notes": "Беречь от пыли",
+      "sort_order": 2
+    },
+    {
+      "id": "comp-opt-3",
+      "kit_id": "pasco-kit-3",
+      "name": "Зеркало плоское",
+      "quantity": 3,
+      "photo_url": null,
+      "description": "Для опытов отражения",
+      "storage_location": "Box 5",
+      "notes": null,
+      "sort_order": 3
+    },
+    {
+      "id": "comp-opt-4",
+      "kit_id": "pasco-kit-3",
+      "name": "Щель для дифракции",
+      "quantity": 1,
+      "photo_url": null,
+      "description": "Для наблюдения дифракционной картины",
+      "storage_location": "Box 5",
+      "notes": null,
+      "sort_order": 4
+    },
+    {
+      "id": "comp-wav-1",
+      "kit_id": "pasco-kit-4",
+      "name": "Камертон набор",
+      "quantity": 8,
+      "photo_url": null,
+      "description": "Разные частоты 256Hz - 512Hz",
+      "storage_location": "Box 6",
+      "notes": null,
+      "sort_order": 1
+    },
+    {
+      "id": "comp-wav-2",
+      "kit_id": "pasco-kit-4",
+      "name": "Датчик звука PASCO",
+      "quantity": 2,
+      "photo_url": null,
+      "description": "Для измерения интенсивности звука",
+      "storage_location": "Box 6",
+      "notes": "Беспроводной",
+      "sort_order": 2
+    },
+    {
+      "id": "comp-wav-3",
+      "kit_id": "pasco-kit-4",
+      "name": "Струна на резонаторе",
+      "quantity": 1,
+      "photo_url": null,
+      "description": "Для опытов со стоячими волнами",
+      "storage_location": "Box 6",
+      "notes": null,
+      "sort_order": 3
+    }
+  ]
+}

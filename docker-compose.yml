@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pasco-lab-postgres
+    environment:
+      POSTGRES_DB: pasco_lab_db
+      POSTGRES_USER: pasco_user
+      POSTGRES_PASSWORD: pasco_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - pasco-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pasco_user -d pasco_lab_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pasco-lab-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - pasco-network
+    depends_on:
+      - postgres
+
+networks:
+  pasco-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
