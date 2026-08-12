@@ -4,6 +4,10 @@ export type DataProvider = 'supabase' | 'hybrid' | 'local' | 'postgresql'
 
 const VALID_PROVIDERS = new Set<DataProvider>(['supabase', 'hybrid', 'local', 'postgresql'])
 
+function hasPostgresEnv() {
+  return Boolean(process.env.DATABASE_URL)
+}
+
 export function getDataProvider(): DataProvider {
   const provider = (
     process.env.NEXT_PUBLIC_DATA_PROVIDER ??
@@ -16,8 +20,16 @@ export function getDataProvider(): DataProvider {
     return provider
   }
 
+  // По умолчанию используем PostgreSQL, если он настроен.
+  // Supabase остаётся как запасной вариант (hybrid), только если
+  // PostgreSQL не настроен, но есть Supabase-ключи.
+  if (hasPostgresEnv()) {
+    return 'postgresql'
+  }
+
   return hasSupabasePublicEnv() ? 'hybrid' : 'local'
 }
+
 
 export function shouldTrySupabaseData(provider = getDataProvider()) {
   return provider === 'supabase' || provider === 'hybrid'

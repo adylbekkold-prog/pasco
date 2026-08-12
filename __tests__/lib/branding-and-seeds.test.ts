@@ -43,7 +43,8 @@ describe('portal branding and seeded catalog data', () => {
     const pascoText = [
       ...kyrgyzKits.flatMap((kit) => [kit.name, kit.description]),
       ...kyrgyzComponents.flatMap((component) => [component.name, component.description, component.storage_location]),
-    ].filter(Boolean)
+    ].filter((text): text is string => Boolean(text))
+
 
     expect(kyrgyzKits.length).toBeGreaterThan(0)
     expect(kyrgyzComponents.length).toBeGreaterThan(0)
