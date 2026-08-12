@@ -13,7 +13,6 @@ interface PhotoNode {
 
 interface LabPhotoBrowserProps {
   onPhotosSelect?: (photos: string[]) => void
-  onPathChange?: (path: string) => void
   locale?: 'ru' | 'ky'
 }
 
@@ -107,7 +106,6 @@ function FileTreeNode({
 
 export default function LabPhotoBrowser({
   onPhotosSelect,
-  onPathChange,
   locale = 'ru',
 }: LabPhotoBrowserProps) {
   const copy = getCopy(locale)

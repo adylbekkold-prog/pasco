@@ -1,8 +1,8 @@
 import type { Difficulty, Locale } from '@/types'
 
 export const siteConfig = {
-  name: 'PASCO Lab Portal',
-  shortName: 'PASCO Labs',
+  name: 'PASCO Lab',
+  shortName: 'PASCO Lab',
 }
 
 const siteDescriptions: Record<Locale, string> = {

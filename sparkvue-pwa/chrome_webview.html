@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SPARKvue</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' blob: data:; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-src 'self' blob: data:; img-src 'self' data: blob:; media-src 'self' data: blob:; manifest-src 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:;">
+  <meta name="viewport" charset="utf-8" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="stylesheet" href="javascripts/mediaelement/mediaelementplayer.css">
+  <link rel="stylesheet" href="stylesheets/wysiwyg.css">
+  <link rel="stylesheet" href="stylesheets/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="stylesheets/spectrum.css">
+  <link rel="stylesheet" href="stylesheets/style.css">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="placeholder" href="./manifest" id="webapp">
+  <!--link(rel='stylesheet', href='stylesheets_rtl/style_rtl.css')-->
+  <script>window.isChromeApp = true;</script>
+  <!-- Platform Specific scripts are uncommented by gradle script before jade is run and then index.jade is rechecked out after jade runs-->
+  <!---->
+  <!--script(src="cordova.js")-->
+  <script src="javascripts/Qt/5.6.0/qwebchannel.js"></script>
+  <script src="javascripts/jquery/jquery.min.js"></script>
+  <script src="javascripts/jquery/jquery-ui.min.js"></script>
+  <script src="javascripts/jquery/jquery.textFit.min.js"></script>
+  <script src="javascripts/jquery/jquery.transit.js"></script>
+  <script src="javascripts/jquery/jquery.csv-0.71.min.js"></script>
+  <script src="javascripts/jquery/globalize.js"></script>
+  <script src="javascripts/jquery/sprintf-0.7-beta1.js"></script>
+  <script src="javascripts/jquery/hammer.js"></script>
+  <script src="javascripts/jquery/spectrum.js"></script>
+  <script src="javascripts/html2canvas/html2canvas.min.js"></script>
+  <script src="javascripts/offline_guard.js"></script>
+  <script src="javascripts/analytics/google_analytics.offline.js"></script>
+  <script src="javascripts/sparklibrary.js"></script>
+</head>
+<body id="busyBody">
+  <div id="main"></div>
+  <script async src="spark.js" id="webapp"></script>
+</body>
+</html>

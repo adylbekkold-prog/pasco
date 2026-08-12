@@ -1,10 +1,10 @@
 // D:\pasco-lab-portal\app\(admin)\admin\pasco-kits\new\page.tsx
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { redirect } from 'next/navigation'
 import { getCurrentLocale } from '@/lib/locale-server'
 import { getLocalSubjects } from '@/lib/local-db'
 import { assertServerLocalAdminAccess } from '@/lib/admin-access'
+import { adminPath } from '@/lib/admin-routes'
 import { Button } from '@/components/ui/button'
 import { PascoKitForm } from '@/components/PascoKitForm'
 import { getAdminCopy } from '@/lib/i18n/admin'
@@ -17,8 +17,8 @@ async function NewKitPage() {
   const subjects = await getLocalSubjects(locale)
   return (
     <div className="max-w-2xl space-y-8">
-      <div><Link href="/admin/pasco-kits"><Button variant="outline" className="gap-2 mb-4"><ArrowLeft size={18} />{copy.back}</Button></Link></div>
-      <PascoKitForm subjects={subjects} locale={locale} onSuccess={(kit) => redirect(`/admin/pasco-kits/${kit.id}`)} />
+      <div><Link href={adminPath('/pasco-kits')}><Button variant="outline" className="gap-2 mb-4"><ArrowLeft size={18} />{copy.back}</Button></Link></div>
+      <PascoKitForm subjects={subjects} locale={locale} />
     </div>
   )
 }

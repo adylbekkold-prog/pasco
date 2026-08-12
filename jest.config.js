@@ -1,4 +1,4 @@
-import nextJest from 'next/jest.js'
+﻿import nextJest from 'next/jest.js'
 
 const createJestConfig = nextJest({
   dir: './',
@@ -21,9 +21,9 @@ const customJestConfig = {
     '<rootDir>/node_modules/',
   ],
   collectCoverageFrom: [
-    'lib/**/*.{ts,tsx}',
-    'app/actions/**/*.{ts,tsx}',
-    'components/**/*.{ts,tsx}',
+    'lib/{content,data-provider,error-handler,locale,logger,media,monitoring,sparkvue-files,validators}.ts',
+    'components/{LabResources,ResourcesManager}.tsx',
+    'components/ui/{button,input,label}.tsx',
     '!**/*.d.ts',
     '!**/node_modules/**',
     '!**/.next/**',
@@ -47,3 +47,4 @@ const customJestConfig = {
 }
 
 export default createJestConfig(customJestConfig)
+

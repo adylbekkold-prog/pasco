@@ -16,6 +16,25 @@ function normalizeText(value: string | null | undefined) {
   return trimmed ? trimmed : null
 }
 
+export function hasLocalizedText(record: object, baseField: string, locale: Locale) {
+  const values = record as Record<string, unknown>
+  const localizedValue = values[`${baseField}_${locale}`]
+
+  if (normalizeText(typeof localizedValue === 'string' ? localizedValue : null)) {
+    return true
+  }
+
+  if (locale === 'ky') return false
+
+  const kyrgyzValue = values[`${baseField}_ky`]
+  const baseValue = values[baseField]
+
+  return (
+    !normalizeText(typeof kyrgyzValue === 'string' ? kyrgyzValue : null) &&
+    Boolean(normalizeText(typeof baseValue === 'string' ? baseValue : null))
+  )
+}
+
 function getLocalizedText({
   locale,
   baseValue,
@@ -29,15 +48,18 @@ function getLocalizedText({
   kyValue?: string | null
   fallbackValue?: string | null
 }) {
-  return locale === 'ky'
-    ? normalizeText(kyValue) ??
-        normalizeText(baseValue) ??
-        normalizeText(fallbackValue) ??
-        normalizeText(ruValue)
-    : normalizeText(ruValue) ??
-        normalizeText(baseValue) ??
-        normalizeText(fallbackValue) ??
-        normalizeText(kyValue)
+  const localizedValue = locale === 'ky' ? normalizeText(kyValue) : normalizeText(ruValue)
+
+  if (localizedValue) return localizedValue
+
+  const sameLocaleFallback = normalizeText(fallbackValue)
+  if (sameLocaleFallback) return sameLocaleFallback
+
+  if (locale === 'ru' && !normalizeText(kyValue)) {
+    return normalizeText(baseValue)
+  }
+
+  return null
 }
 
 export function buildLocalizedTextColumns(
@@ -78,7 +100,7 @@ export function localizeSubject(
         ruValue: subject.name_ru,
         kyValue: subject.name_ky,
         fallbackValue: fallback?.name,
-      }) ?? subject.name,
+      }) ?? '',
     icon: subject.icon ?? fallback?.icon ?? null,
     color: subject.color ?? fallback?.color ?? null,
     sort_order: subject.sort_order ?? fallback?.sort_order ?? 0,
@@ -95,7 +117,7 @@ export function localizeGrade(grade: Grade, locale: Locale, fallback?: Grade | n
         ruValue: grade.label_ru,
         kyValue: grade.label_ky,
         fallbackValue: fallback?.label,
-      }) ?? grade.label,
+      }) ?? '',
   }
 }
 
@@ -113,7 +135,7 @@ export function localizeEquipment(
         ruValue: equipment.name_ru,
         kyValue: equipment.name_ky,
         fallbackValue: fallback?.name,
-      }) ?? equipment.name,
+      }) ?? '',
   }
 }
 
@@ -127,39 +149,14 @@ export function localizeLab(lab: Lab, locale: Locale, fallback?: Lab | null): La
         ruValue: lab.title_ru,
         kyValue: lab.title_ky,
         fallbackValue: fallback?.title,
-      }) ?? lab.title,
-    topic:
-      getLocalizedText({
-        locale,
-        baseValue: lab.topic,
-        ruValue: lab.topic_ru,
-        kyValue: lab.topic_ky,
-        fallbackValue: fallback?.topic,
-      }) ?? null,
-    goal:
-      getLocalizedText({
-        locale,
-        baseValue: lab.goal,
-        ruValue: lab.goal_ru,
-        kyValue: lab.goal_ky,
-        fallbackValue: fallback?.goal,
-      }) ?? null,
-    expected_results:
-      getLocalizedText({
-        locale,
-        baseValue: lab.expected_results,
-        ruValue: lab.expected_results_ru,
-        kyValue: lab.expected_results_ky,
-        fallbackValue: fallback?.expected_results,
-      }) ?? null,
-    teacher_notes:
-      getLocalizedText({
-        locale,
-        baseValue: lab.teacher_notes,
-        ruValue: lab.teacher_notes_ru,
-        kyValue: lab.teacher_notes_ky,
-        fallbackValue: fallback?.teacher_notes,
-      }) ?? null,
+      }) ?? '',
+    content: getLocalizedText({
+      locale,
+      baseValue: lab.content,
+      ruValue: lab.content_ru,
+      kyValue: lab.content_ky,
+      fallbackValue: fallback?.content,
+    }),
   }
 }
 
@@ -199,7 +196,15 @@ export function localizeResource(
         ruValue: resource.title_ru,
         kyValue: resource.title_ky,
         fallbackValue: fallback?.title,
-      }) ?? resource.title,
+      }) ?? '',
+    description:
+      getLocalizedText({
+        locale,
+        baseValue: resource.description,
+        ruValue: resource.description_ru,
+        kyValue: resource.description_ky,
+        fallbackValue: fallback?.description,
+      }) ?? null,
   }
 }
 
@@ -217,7 +222,7 @@ export function localizeEquipmentItem(
         ruValue: item.item_name_ru,
         kyValue: item.item_name_ky,
         fallbackValue: fallback?.item_name,
-      }) ?? item.item_name,
+      }) ?? '',
     notes:
       getLocalizedText({
         locale,

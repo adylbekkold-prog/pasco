@@ -1,5 +1,6 @@
 import { headers } from 'next/headers'
 import type { NextRequest } from 'next/server'
+import { hasAdminSession } from '@/lib/admin-auth'
 import { isLocalOnlyMode } from '@/lib/data-provider'
 
 function normalizeHost(value: string | null | undefined) {
@@ -20,48 +21,84 @@ function isLoopbackHost(host: string) {
 }
 
 function isPrivateNetworkHost(host: string) {
-  // Check for standard private IP ranges
   return (
     host.startsWith('192.168.') ||
     host.startsWith('10.') ||
-    host.startsWith('172.16.') ||
-    host.startsWith('172.17.') ||
-    host.startsWith('172.18.') ||
-    host.startsWith('172.19.') ||
-    host.startsWith('172.20.') ||
-    host.startsWith('172.21.') ||
-    host.startsWith('172.22.') ||
-    host.startsWith('172.23.') ||
-    host.startsWith('172.24.') ||
-    host.startsWith('172.25.') ||
-    host.startsWith('172.26.') ||
-    host.startsWith('172.27.') ||
-    host.startsWith('172.28.') ||
-    host.startsWith('172.29.') ||
-    host.startsWith('172.30.') ||
-    host.startsWith('172.31.') ||
+    /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
     host.startsWith('169.254.')
   )
 }
 
-export function isAllowedLocalAdminHost(host: string | null | undefined) {
-  const normalized = normalizeHost(host)
-  return isLoopbackHost(normalized) || isPrivateNetworkHost(normalized)
+function isClientFromTrustedProxy(request: NextRequest): boolean {
+  const trustedProxies = process.env.TRUSTED_PROXIES
+  if (!trustedProxies) return false
+
+  const clientIp =
+    request.headers.get('x-real-ip') ??
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+
+  if (!clientIp) return false
+
+  const allowed = trustedProxies
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+
+  return allowed.some((cidr) => {
+    if (cidr === clientIp) return true
+    // Simple prefix match for CIDR-like values (e.g. "192.168.0.")
+    if (cidr.endsWith('/')) return clientIp.startsWith(cidr)
+    return false
+  })
 }
 
-export function isAllowedLocalAdminRequest(request: NextRequest) {
-  return isAllowedLocalAdminHost(
-    request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? request.nextUrl.host
+export function isAllowedLocalAdminHost(host: string | null | undefined) {
+  const normalized = normalizeHost(host)
+  const allowedHosts = [
+    process.env.NEXT_PUBLIC_ADMIN_HOST,
+    process.env.ADMIN_HOST,
+    process.env.VPS_HOST,
+  ].filter(Boolean) as string[]
+
+  return (
+    isLoopbackHost(normalized) ||
+    isPrivateNetworkHost(normalized) ||
+    allowedHosts.some((allowedHost) => normalizeHost(allowedHost) === normalized)
   )
 }
 
+export function isAllowedLocalAdminRequest(request: NextRequest) {
+  const xForwardedHost = request.headers.get('x-forwarded-host')
+  const host = request.headers.get('host') ?? request.nextUrl.host
+
+  // Only trust X-Forwarded-Host when the client connects through a
+  // known proxy (e.g. LAN nginx).  Without TRUSTED_PROXIES the header
+  // is attacker-controlled and must be ignored.
+  const effectiveHost =
+    xForwardedHost && isClientFromTrustedProxy(request)
+      ? xForwardedHost
+      : host
+
+  return isAllowedLocalAdminHost(effectiveHost)
+}
+
 export async function assertServerLocalAdminAccess() {
+  if (!(await hasAdminSession())) {
+    throw new Error('Для доступа к админке требуется пароль.')
+  }
+
   if (!isLocalOnlyMode()) return
 
   const headersList = await headers()
-  const host = headersList.get('x-forwarded-host') ?? headersList.get('host')
+  const xForwardedHost = headersList.get('x-forwarded-host')
+  const host = headersList.get('host')
 
-  if (!isAllowedLocalAdminHost(host)) {
+  // For server actions there is no NextRequest, so we fall back to
+  // always using the direct Host header unless TRUSTED_PROXIES is set.
+  const useForwarded = Boolean(process.env.TRUSTED_PROXIES) && Boolean(xForwardedHost)
+  const effectiveHost = useForwarded ? xForwardedHost : host
+
+  if (!isAllowedLocalAdminHost(effectiveHost)) {
     throw new Error('Локальная админка доступна только на этом компьютере.')
   }
 }

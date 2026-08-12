@@ -111,6 +111,7 @@ export default function StepBuilder({
                   className="step-block-action"
                   onClick={() => moveStep(index, -1)}
                   disabled={index === 0}
+                  aria-label={`${locale === 'ky' ? 'Кадамды өйдө жылдыруу' : 'Переместить шаг выше'} ${index + 1}`}
                 >
                   <ArrowUp size={13} />
                 </button>
@@ -119,6 +120,7 @@ export default function StepBuilder({
                   className="step-block-action"
                   onClick={() => moveStep(index, 1)}
                   disabled={index === steps.length - 1}
+                  aria-label={`${locale === 'ky' ? 'Кадамды ылдый жылдыруу' : 'Переместить шаг ниже'} ${index + 1}`}
                 >
                   <ArrowDown size={13} />
                 </button>
@@ -126,6 +128,7 @@ export default function StepBuilder({
                   type="button"
                   className="step-block-action del"
                   onClick={() => removeStep(step.id)}
+                  aria-label={`${locale === 'ky' ? 'Кадамды өчүрүү' : 'Удалить шаг'} ${index + 1}`}
                 >
                   <Trash2 size={13} />
                 </button>

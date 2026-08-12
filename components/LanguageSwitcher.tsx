@@ -1,8 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useTransition } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { setLocale as setLocaleAction } from '@/app/actions/locale.actions'
 import { getLocaleName, locales } from '@/lib/locale'
 import type { Locale } from '@/types'
+
+const LAB_DETAIL_PATH_PATTERN = /^\/labs\/[^/]+\/?$/
 
 export default function LanguageSwitcher({
   locale,
@@ -11,38 +15,28 @@ export default function LanguageSwitcher({
   locale: Locale
   variant?: 'default' | 'dark'
 }) {
-  const [isPending, setIsPending] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+  const pathname = usePathname()
 
-  const switchLocale = async (nextLocale: Locale) => {
-    console.log('switchLocale called with:', nextLocale, 'current:', locale)
-    if (nextLocale === locale) {
-      console.log('Same locale, skipping')
-      return
-    }
-    setIsPending(true)
+  const switchLocale = (nextLocale: Locale) => {
+    if (nextLocale === locale) return
+    startTransition(async () => {
+      await setLocaleAction(nextLocale)
 
-    try {
-      console.log('Sending request to /api/locale')
-      const response = await fetch('/api/locale', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ locale: nextLocale }),
-        credentials: 'include',
-      })
-
-      console.log('Response status:', response.status)
-      if (response.ok) {
-        console.log('Reloading page...')
-        window.location.reload()
+      if (LAB_DETAIL_PATH_PATTERN.test(pathname ?? '')) {
+        router.push('/')
+        return
       }
-    } catch (error) {
-      console.error('Failed to switch locale:', error)
-      setIsPending(false)
-    }
+
+      router.refresh()
+    })
   }
 
   return (
     <div
+      role="group"
+      aria-label={locale === 'ky' ? 'Интерфейстин тили' : 'Язык интерфейса'}
       className={`inline-flex items-center gap-1 rounded-lg p-0.5 border ${
         variant === 'dark'
           ? 'border-[var(--border)] bg-[var(--surface-muted)]'
@@ -55,7 +49,13 @@ export default function LanguageSwitcher({
           type="button"
           onClick={() => switchLocale(item)}
           disabled={isPending}
-          className={`rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+          aria-pressed={item === locale}
+          aria-label={
+            locale === 'ky'
+              ? `${getLocaleName(item)} тилин тандоо`
+              : `Выбрать язык ${getLocaleName(item)}`
+          }
+          className={`cursor-pointer rounded-md px-3 py-1.5 text-xs font-semibold transition ${
             item === locale
               ? 'bg-[var(--primary)] text-white shadow-sm'
               : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--background-2)]'

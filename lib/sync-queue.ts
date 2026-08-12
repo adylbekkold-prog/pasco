@@ -210,13 +210,8 @@ async function syncLabToRemote(
     id: localLab.id,
     slug: localLab.slug,
     ...buildLocalizedTextColumns('title', localLab.title, locale),
-    ...buildLocalizedTextColumns('topic', localLab.topic, locale),
-    ...buildLocalizedTextColumns('goal', localLab.goal, locale),
-    ...buildLocalizedTextColumns('expected_results', localLab.expected_results, locale),
-    ...buildLocalizedTextColumns('teacher_notes', localLab.teacher_notes, locale),
+    ...buildLocalizedTextColumns('content', localLab.content, locale),
     thumbnail_url: localLab.thumbnail_url,
-    duration_minutes: localLab.duration_minutes,
-    difficulty: localLab.difficulty,
     is_published: localLab.is_published,
     subject_id: resolveRemoteSubjectId(
       localLab.subject_id,
@@ -224,11 +219,9 @@ async function syncLabToRemote(
       remoteCatalogs.subjects
     ),
     grade_id: resolveRemoteGradeId(localLab.grade_id, localGrades, remoteCatalogs.grades),
-    equipment_id: resolveRemoteEquipmentId(
-      localLab.equipment_ids?.[0] ?? null,
-      localEquipment,
-      remoteCatalogs.equipment
-    ),
+    equipment_ids: localLab.equipment_ids
+      ?.map((eqId) => resolveRemoteEquipmentId(eqId, localEquipment, remoteCatalogs.equipment))
+      .filter((id): id is string => id !== null) ?? null,
     created_at: localLab.created_at,
     updated_at: localLab.updated_at,
   })

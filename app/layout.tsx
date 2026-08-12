@@ -1,29 +1,46 @@
 import type { Metadata } from 'next'
-import { Exo_2, Manrope } from 'next/font/google'
 import AuthHashRouter from '@/components/AuthHashRouter'
+import { ThemeProvider } from '@/components/ThemeProvider'
+import { ToastProvider } from '@/components/ui/toast'
 import { getSiteDescription, siteConfig } from '@/lib/content'
 import { getCurrentLocale } from '@/lib/locale-server'
+import { getSiteUrl } from '@/lib/site-url'
 import './globals.css'
-
-const bodyFont = Manrope({
-  subsets: ['latin', 'cyrillic'],
-  variable: '--font-sans',
-})
-
-const displayFont = Exo_2({
-  subsets: ['latin', 'cyrillic'],
-  variable: '--font-display',
-})
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getCurrentLocale()
 
   return {
+    metadataBase: getSiteUrl(),
     title: {
       default: siteConfig.name,
       template: `%s | ${siteConfig.name}`,
     },
     description: getSiteDescription(locale),
+    applicationName: siteConfig.name,
+    keywords: ['PASCO', 'SPARKvue', 'STEM', 'physics labs', 'school labs'],
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    openGraph: {
+      title: siteConfig.name,
+      description: getSiteDescription(locale),
+      siteName: siteConfig.name,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: siteConfig.name,
+      description: getSiteDescription(locale),
+    },
   }
 }
 
@@ -37,12 +54,16 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${bodyFont.variable} ${displayFont.variable}`}
       data-scroll-behavior="smooth"
+      suppressHydrationWarning
     >
       <body className="font-sans-app min-h-screen bg-[var(--background)] text-[var(--text)] antialiased">
-        <AuthHashRouter />
-        {children}
+        <ThemeProvider>
+          <ToastProvider>
+            <AuthHashRouter />
+            {children}
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

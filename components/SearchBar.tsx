@@ -1,10 +1,8 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useId, useState, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { LoaderCircle, Search, X } from 'lucide-react'
 import type { Locale } from '@/types'
 
 interface SearchBarProps {
@@ -22,28 +20,35 @@ export default function SearchBar({
 }: SearchBarProps) {
   const [query, setQuery] = useState(initialQuery)
   const [isPending, startTransition] = useTransition()
+  const inputId = useId()
   const router = useRouter()
   const searchParams = useSearchParams()
   const copy =
     locale === 'ky'
       ? {
+          clear: 'Издөөнү тазалоо',
+          label: 'Лабораторияларды издөө',
+          pending: 'Издөө...',
           placeholder: 'Аталышы, темасы же жабдуусу боюнча издөө',
-          pending: 'Издеп жатабыз...',
           submit: 'Табуу',
         }
       : {
-          placeholder: 'Поиск по названию, теме или оборудованию',
+          clear: 'Очистить поиск',
+          label: 'Поиск лабораторных работ',
           pending: 'Ищем...',
+          placeholder: 'Поиск по названию, теме или оборудованию',
           submit: 'Найти',
         }
+  const placeholderText = placeholder ?? copy.placeholder
 
-  const handleSearch = (event: React.FormEvent) => {
-    event.preventDefault()
+  useEffect(() => {
+    setQuery(initialQuery)
+  }, [initialQuery])
 
+  function navigateWithQuery(nextSearch: string | null) {
     const nextParams = new URLSearchParams(searchParams.toString())
-    const normalized = query.trim()
 
-    if (normalized) nextParams.set('search', normalized)
+    if (nextSearch) nextParams.set('search', nextSearch)
     else nextParams.delete('search')
 
     startTransition(() => {
@@ -52,40 +57,69 @@ export default function SearchBar({
     })
   }
 
+  function handleSearch(event: React.FormEvent) {
+    event.preventDefault()
+    navigateWithQuery(query.trim() || null)
+  }
+
+  function handleClear() {
+    setQuery('')
+    navigateWithQuery(null)
+  }
+
   const shellClassName =
     variant === 'hero'
-      ? 'border-slate-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.08)]'
+      ? 'min-h-[64px] border-slate-200 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.10)]'
       : variant === 'header'
-        ? 'border-slate-200 bg-white'
-        : 'border-slate-200 bg-slate-50'
+        ? 'min-h-[48px] border-slate-200 bg-white shadow-sm'
+        : 'min-h-[54px] border-slate-200 bg-slate-50 shadow-sm'
 
-  const buttonClassName =
+  const submitButtonClassName =
     variant === 'hero'
-      ? 'h-[58px] rounded-[18px] bg-[#1848c6] px-6 text-white hover:bg-[#123ba5]'
-      : 'rounded-[16px] bg-[#1848c6] px-5 text-white hover:bg-[#123ba5]'
+      ? 'min-h-11 px-5 text-sm'
+      : variant === 'header'
+        ? 'min-h-9 px-4 text-xs'
+        : 'min-h-10 px-4 text-sm'
 
   return (
-    <form onSubmit={handleSearch} className="flex w-full flex-col gap-3 sm:flex-row">
+    <form onSubmit={handleSearch} role="search" className="w-full">
+      <label htmlFor={inputId} className="sr-only">
+        {copy.label}
+      </label>
+
       <div
-        className={`flex flex-1 items-center gap-3 overflow-hidden rounded-[20px] border px-5 ${shellClassName}`}
+        className={`flex w-full items-center gap-2 rounded-[18px] border px-3 transition focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-100 sm:gap-3 sm:px-4 ${shellClassName}`}
       >
-        <Search size={18} className="shrink-0 text-slate-400" />
-        <Input
+        <Search size={19} className="shrink-0 text-slate-400" aria-hidden="true" />
+        <input
+          id={inputId}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder={placeholder ?? copy.placeholder}
-          className="h-[58px] border-0 bg-transparent px-0 text-[15px] text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0"
+          placeholder={placeholderText}
+          autoComplete="off"
+          className="h-11 min-w-0 flex-1 border-0 bg-transparent px-0 text-[15px] font-medium text-slate-950 outline-none placeholder:text-slate-400 focus-visible:outline-none"
         />
-      </div>
 
-      <Button
-        type="submit"
-        size={variant === 'header' ? 'sm' : 'lg'}
-        className={buttonClassName}
-        disabled={isPending}
-      >
-        {isPending ? copy.pending : copy.submit}
-      </Button>
+        {query.trim().length > 0 && (
+          <button
+            type="button"
+            onClick={handleClear}
+            aria-label={copy.clear}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          >
+            <X size={16} aria-hidden="true" />
+          </button>
+        )}
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#1647c5] font-bold text-white transition hover:bg-[#123ba5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1647c5] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 ${submitButtonClassName}`}
+        >
+          {isPending && <LoaderCircle size={15} className="animate-spin" aria-hidden="true" />}
+          <span>{isPending ? copy.pending : copy.submit}</span>
+        </button>
+      </div>
     </form>
   )
 }

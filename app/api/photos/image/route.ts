@@ -15,22 +15,21 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  try {
-    const fullPath = path.join(LAB_PHOTOS_DIR, decodeURIComponent(filePath))
-    
-    // Security: ensure the path is within lab_photos directory
-    const resolvedPath = path.resolve(fullPath)
-    if (!resolvedPath.startsWith(path.resolve(LAB_PHOTOS_DIR))) {
-      return NextResponse.json(
-        { error: 'Invalid path' },
-        { status: 403 }
-      )
-    }
+  const root = path.resolve(LAB_PHOTOS_DIR)
+  // Resolve against the root, then verify with path.relative — startsWith is
+  // unsafe because path.join(root, '/etc/passwd') collapses to root/etc/passwd
+  // and would pass a naive prefix check.
+  const resolvedPath = path.resolve(root, decodeURIComponent(filePath))
+  const relative = path.relative(root, resolvedPath)
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
+    return NextResponse.json({ error: 'Invalid path' }, { status: 403 })
+  }
 
-    const fileBuffer = await fs.readFile(fullPath)
+  try {
+    const fileBuffer = await fs.readFile(resolvedPath)
     
     // Determine the content type based on file extension
-    const ext = path.extname(fullPath).toLowerCase()
+    const ext = path.extname(resolvedPath).toLowerCase()
     const contentType = {
       '.png': 'image/png',
       '.jpg': 'image/jpeg',

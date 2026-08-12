@@ -3,7 +3,6 @@
  * Tests for data validation
  */
 
-import { z } from 'zod'
 import { CreateLabSchema } from '@/lib/validators'
 
 describe('Data Validators', () => {
@@ -79,7 +78,7 @@ describe('Data Validators', () => {
       let threwError = false
       try {
         CreateLabSchema.parse(labData)
-      } catch (error) {
+      } catch {
         threwError = true
       }
       expect(threwError).toBe(true)
@@ -94,7 +93,7 @@ describe('Data Validators', () => {
       let threwError = false
       try {
         CreateLabSchema.parse(labData)
-      } catch (error) {
+      } catch {
         threwError = true
       }
       expect(threwError).toBe(true)

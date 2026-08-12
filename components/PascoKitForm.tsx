@@ -1,18 +1,20 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { createPascoKitAction, updatePascoKitAction } from '@/app/actions/pasco-kit.actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import type { Grade, Locale, PascoKit, Subject } from '@/types'
+import { adminPath } from '@/lib/admin-routes'
+import type { Locale, PascoKit, Subject } from '@/types'
 
 interface PascoKitFormProps {
   subjects: Subject[]
   locale: Locale
   initialKit?: PascoKit | null
-  onSuccess: (kit: PascoKit) => void
+  onSuccess?: (kit: PascoKit) => void
 }
 
 function getCopy(locale: Locale) {
@@ -25,21 +27,22 @@ function getCopy(locale: Locale) {
         name: 'Комплекттин аталышы',
         subject: 'Предмет',
         description: 'Сүрөттөлүшү',
-        thumbnail: 'Миниатюрасы',
       },
       placeholders: {
         name: 'Мисалы: Механика комплекти',
-        description: 'Комплект эмне үчүн колдонулат жана анын мазмуну',
+        description: 'Комплект эмнеге колдонулат жана анын курамында эмне бар',
       },
       selects: {
         subject: 'Предметти тандаңыз',
       },
       buttons: {
         create: 'Комплект түзүү',
-        update: 'Комплекти жаңыртуу',
+        update: 'Комплектти жаңыртуу',
         saving: 'Сакталууда...',
-        cancel: 'Жокко чыгуу',
       },
+      saved: 'Комплект сакталды.',
+      requiredName: 'Аталышын жазыңыз',
+      requiredSubject: 'Предметти тандаңыз',
       error: 'Ката кетти',
     }
   }
@@ -52,11 +55,10 @@ function getCopy(locale: Locale) {
       name: 'Название комплекта',
       subject: 'Предмет',
       description: 'Описание',
-      thumbnail: 'Миниатюра',
     },
     placeholders: {
-      name: 'например: Комплект по механике',
-      description: 'Для чего предназначен этот комплект и что в него входит',
+      name: 'Например: Комплект по механике',
+      description: 'Для чего предназначен комплект и что входит в его состав',
     },
     selects: {
       subject: 'Выберите предмет',
@@ -65,8 +67,10 @@ function getCopy(locale: Locale) {
       create: 'Создать комплект',
       update: 'Обновить комплект',
       saving: 'Сохраняется...',
-      cancel: 'Отмена',
     },
+    saved: 'Комплект сохранен.',
+    requiredName: 'Название обязательно',
+    requiredSubject: 'Выберите предмет',
     error: 'Произошла ошибка',
   }
 }
@@ -78,6 +82,7 @@ export function PascoKitForm({
   onSuccess,
 }: PascoKitFormProps) {
   const copy = getCopy(locale)
+  const router = useRouter()
   const isEditing = !!initialKit
 
   const [data, setData] = useState({
@@ -89,18 +94,20 @@ export function PascoKitForm({
 
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
+    setSaved(false)
 
     if (!data.name.trim()) {
-      setError('Название обязательно')
+      setError(copy.requiredName)
       return
     }
 
     if (!data.subject_id) {
-      setError('Выберите предмет')
+      setError(copy.requiredSubject)
       return
     }
 
@@ -113,18 +120,28 @@ export function PascoKitForm({
           name: data.name.trim(),
           subject_id: data.subject_id,
           description: data.description.trim() || null,
-          thumbnail_url: data.thumbnail_url,
+          thumbnail_url: data.thumbnail_url || null,
+          locale,
         })
       } else {
         kit = await createPascoKitAction({
           name: data.name.trim(),
           subject_id: data.subject_id,
           description: data.description.trim() || null,
-          thumbnail_url: data.thumbnail_url,
+          thumbnail_url: data.thumbnail_url || null,
+          locale,
         })
       }
 
-      onSuccess(kit)
+      if (onSuccess) {
+        onSuccess(kit)
+      } else if (isEditing) {
+        setSaved(true)
+        router.refresh()
+        window.setTimeout(() => setSaved(false), 3000)
+      } else {
+        router.push(adminPath(`/pasco-kits/${kit.id}`))
+      }
     } catch (error) {
       setError(error instanceof Error ? error.message : copy.error)
       console.error(error)
@@ -136,13 +153,19 @@ export function PascoKitForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <div className="section-kicker">Комплект</div>
+        <div className="section-kicker">PASCO</div>
         <h2 className="section-title">{copy.sections.main}</h2>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+        <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
           {error}
+        </div>
+      )}
+
+      {saved && (
+        <div role="status" className="rounded-lg border border-green-200 bg-green-50 p-4 text-green-700">
+          {copy.saved}
         </div>
       )}
 

@@ -61,6 +61,9 @@ export interface Resource {
   title: string
   title_ru?: string | null
   title_ky?: string | null
+  description?: string | null
+  description_ru?: string | null
+  description_ky?: string | null
   url: string
   file_size: number | null
   sort_order: number
@@ -95,6 +98,7 @@ export interface Lab {
   content_ru?: string | null
   content_ky?: string | null
   thumbnail_url: string | null
+  photo_urls?: string[] | null
   is_published: boolean
   subject_id: string | null
   grade_id: string | null
@@ -108,19 +112,7 @@ export interface Lab {
   resources?: Resource[]
   equipment_items?: EquipmentItem[]
   lab_steps?: LabStep[]
-  // Fields for lab content
-  topic?: string | null
-  topic_ru?: string | null
-  topic_ky?: string | null
-  goal?: string | null
-  goal_ru?: string | null
-  goal_ky?: string | null
-  expected_results?: string | null
-  expected_results_ru?: string | null
-  expected_results_ky?: string | null
-  teacher_notes?: string | null
-  teacher_notes_ru?: string | null
-  teacher_notes_ky?: string | null
+  // Timestamp fields (kept for compatibility)
   duration_minutes?: number | null
 }
 

@@ -145,8 +145,9 @@ describe('Logger', () => {
 
   describe('Console Output (Development)', () => {
     it('should output to console in development mode', () => {
-      const originalEnv = (process.env as any).NODE_ENV
-      ;(process.env as any).NODE_ENV = 'development'
+      const mutableEnv = process.env as Record<string, string | undefined>
+      const originalEnv = mutableEnv.NODE_ENV
+      mutableEnv.NODE_ENV = 'development'
 
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
 
@@ -155,13 +156,14 @@ describe('Logger', () => {
       expect(consoleSpy).toHaveBeenCalled()
       expect(consoleSpy.mock.calls[0][0]).toContain('DEBUG')
 
-      ;(process.env as any).NODE_ENV = originalEnv
+      mutableEnv.NODE_ENV = originalEnv
       consoleSpy.mockRestore()
     })
 
     it('should not output to console in production mode', () => {
-      const originalEnv = (process.env as any).NODE_ENV
-      ;(process.env as any).NODE_ENV = 'production'
+      const mutableEnv = process.env as Record<string, string | undefined>
+      const originalEnv = mutableEnv.NODE_ENV
+      mutableEnv.NODE_ENV = 'production'
 
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
 
@@ -169,13 +171,14 @@ describe('Logger', () => {
 
       expect(consoleSpy).not.toHaveBeenCalled()
 
-      ;(process.env as any).NODE_ENV = originalEnv
+      mutableEnv.NODE_ENV = originalEnv
       consoleSpy.mockRestore()
     })
 
     it('should use console.error for error logs', () => {
-      const originalEnv = (process.env as any).NODE_ENV
-      ;(process.env as any).NODE_ENV = 'development'
+      const mutableEnv = process.env as Record<string, string | undefined>
+      const originalEnv = mutableEnv.NODE_ENV
+      mutableEnv.NODE_ENV = 'development'
 
       const errorSpy = jest.spyOn(console, 'error').mockImplementation()
 
@@ -184,7 +187,7 @@ describe('Logger', () => {
 
       expect(errorSpy).toHaveBeenCalled()
 
-      ;(process.env as any).NODE_ENV = originalEnv
+      mutableEnv.NODE_ENV = originalEnv
       errorSpy.mockRestore()
     })
   })

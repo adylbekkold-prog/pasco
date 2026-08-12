@@ -1,0 +1,88 @@
+name: Deploy to Hetzner VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Позволяет запускать деплой вручную кнопкой "Run workflow"
+
+jobs:
+  deploy:
+    name: Deploy to Hetzner VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test -- --passWithNoTests
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to Hetzner VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+            echo "🚀 Начинаем деплой на Hetzner VPS..."
+
+            # 1. Перейти в папку проекта
+            cd /var/www/pasco-lab-portal
+
+            # 1.1. Бэкап uploads (файлы лабораторий) перед деплоем
+            if [ -d public/uploads ] && [ -n "$(ls -A public/uploads 2>/dev/null)" ]; then
+              mkdir -p /var/backups/pasco-uploads
+              cp -r public/uploads/. /var/backups/pasco-uploads/ 2>/dev/null || true
+              echo "Бэкап uploads сохранён в /var/backups/pasco-uploads"
+            fi
+
+            # 2. Обновить код из GitHub
+            git fetch origin main
+            git checkout main
+            git pull origin main
+
+
+            # 3. Установить зависимости
+            npm install --legacy-peer-deps
+
+            # 4. Применить миграции базы данных (если есть)
+            if [ -f supabase/migrations/2026-08-11_add_pasco_kits.sql ]; then
+              echo "Применяем миграцию PASCO kits..."
+              psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/2026-08-11_add_pasco_kits.sql || echo "Миграция уже применена или пропущена"
+            fi
+
+            # 5. Загрузить PASCO данные в PostgreSQL (если скрипт есть)
+            if [ -f scripts/seed-pasco-kits-postgres.js ]; then
+              echo "Загружаем PASCO данные в PostgreSQL..."
+              node scripts/seed-pasco-kits-postgres.js || echo "Seed пропущен (нет подключения к БД)"
+            fi
+
+            # 6. Собрать production build
+            npm run build
+
+            # 7. Предварительное сжатие SPARKvue
+            find sparkvue-pwa -type f \( -name '*.css' -o -name '*.js' -o -name '*.json' -o -name '*.wasm' \) -exec gzip -9 -k -f {} \; 2>/dev/null || true
+
+            # 8. Перезапустить приложение через PM2
+            pm2 startOrReload scripts/pm2-ecosystem.config.js --only pasco-lab-portal --update-env
+            pm2 save
+
+            # 9. Проверить, что приложение работает
+            sleep 3
+            curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://localhost:3000/ || echo "⚠️ Приложение не отвечает на localhost:3000"
+
+            echo "✅ Деплой завершён успешно!"

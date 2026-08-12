@@ -168,30 +168,3 @@ export async function handleServerActionError(
     error: 'An unexpected error occurred',
   }
 }
-
-/**
- * Проверка аутентификации
- */
-export async function requireAuth() {
-  // TODO: Интегрировать с реальной системой аутентификации
-  // const user = await getUser()
-  // if (!user) {
-  //   throw new AuthenticationError()
-  // }
-  // return user
-}
-
-/**
- * Проверка авторизации (требует определенную роль)
- */
-export async function requireRole(allowedRole: 'admin' | 'user' | 'owner') {
-  // TODO: Интегрировать с реальной системой ролей
-  // const user = await getUser()
-  // if (!user) {
-  //   throw new AuthenticationError()
-  // }
-  // if (user.role !== allowedRole) {
-  //   throw new AuthorizationError()
-  // }
-  void allowedRole // For future use
-}

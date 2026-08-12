@@ -1,6 +1,8 @@
-export type DataProvider = 'supabase' | 'hybrid' | 'local'
+import { hasSupabasePublicEnv } from './supabase/env'
 
-const VALID_PROVIDERS = new Set<DataProvider>(['supabase', 'hybrid', 'local'])
+export type DataProvider = 'supabase' | 'hybrid' | 'local' | 'postgresql'
+
+const VALID_PROVIDERS = new Set<DataProvider>(['supabase', 'hybrid', 'local', 'postgresql'])
 
 export function getDataProvider(): DataProvider {
   const provider = (
@@ -14,15 +16,15 @@ export function getDataProvider(): DataProvider {
     return provider
   }
 
-  return 'local'
+  return hasSupabasePublicEnv() ? 'hybrid' : 'local'
 }
 
 export function shouldTrySupabaseData(provider = getDataProvider()) {
-  return provider !== 'local'
+  return provider === 'supabase' || provider === 'hybrid'
 }
 
 export function shouldMirrorLocalData(provider = getDataProvider()) {
-  return provider !== 'supabase'
+  return provider === 'hybrid' || provider === 'local' || provider === 'postgresql'
 }
 
 export function isLocalOnlyMode(provider = getDataProvider()) {

@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { useState, type FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { createLabAction } from '@/app/actions/lab.actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,7 +9,9 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import ResourcesManager from '@/components/ResourcesManager'
 import EquipmentPhotoBrowser from '@/components/EquipmentPhotoBrowser'
-import type { Equipment, Grade, Locale, Subject } from '@/types'
+import StepBuilder from '@/components/StepBuilder'
+import { adminPath } from '@/lib/admin-routes'
+import type { Equipment, Grade, LabStepDraft, Locale, Resource, Subject } from '@/types'
 
 interface LabFormProps {
   subjects: Subject[]
@@ -36,6 +39,7 @@ function getCopy(locale: Locale) {
         content: 'Мазмуну',
         photos: 'Фотографиялар',
         equipment: 'Жабдуулар',
+        steps: 'Иштин кадамдары',
         publish: 'Жарыялоо',
       },
       fields: {
@@ -44,6 +48,8 @@ function getCopy(locale: Locale) {
         subject: 'Предмет',
         grade: 'Класс',
         equipment: 'Жабдуулар',
+        difficulty: 'Татаалдыгы',
+        duration: 'Узактыгы (мүнөт)',
       },
       placeholders: {
         title: 'Мисалы: Ом мыйзамын изилдөө',
@@ -52,13 +58,17 @@ function getCopy(locale: Locale) {
       selects: {
         subject: 'Предметти тандаңыз',
         grade: 'Классты тандаңыз',
+        difficulty: 'Татаалдыкты тандаңыз',
       },
       publishText:
-        'Черновик админкада гана калат. Жарыялангандан кийин лаборатория каталогдо көрүнөт.',
-      saveDraft: 'Черновик кылып сактоо',
+        'Долбоор башкаруу панелинде гана калат. Жарыялангандан кийин лаборатория каталогдо көрүнөт.',
+      saveDraft: 'Долбоор катары сактоо',
       publish: 'Лабораторияны жарыялоо',
       saving: 'Сакталууда...',
       error: 'Лабораторияны сактоо мүмкүн болгон жок.',
+      difficultyOptions: ['Баштапкы', 'Орто', 'Тереңдетилген', 'Профи'],
+      equipmentEmpty: 'Бул предмет үчүн жабдуу кошула элек.',
+      stepsHelp: 'Текстти, сүрөттү, видеону же шилтемени керектүү тартипте кошуңуз.',
     }
   }
 
@@ -68,6 +78,7 @@ function getCopy(locale: Locale) {
       content: 'Содержание',
       photos: 'Фотографии',
       equipment: 'Оборудование',
+      steps: 'Пошаговая инструкция',
       publish: 'Публикация',
     },
     fields: {
@@ -76,6 +87,8 @@ function getCopy(locale: Locale) {
       subject: 'Предмет',
       grade: 'Класс',
       equipment: 'Оборудование',
+      difficulty: 'Сложность',
+      duration: 'Длительность (минуты)',
     },
     placeholders: {
       title: 'Например: Изучение закона Ома',
@@ -85,6 +98,7 @@ function getCopy(locale: Locale) {
     selects: {
       subject: 'Выберите предмет',
       grade: 'Выберите класс',
+      difficulty: 'Выберите сложность',
     },
     publishText:
       'Черновик остаётся только в админке. После публикации лаборатория появится в каталоге.',
@@ -92,6 +106,9 @@ function getCopy(locale: Locale) {
     publish: 'Опубликовать лабораторию',
     saving: 'Сохраняем...',
     error: 'Не удалось сохранить лабораторию.',
+    difficultyOptions: ['Базовый', 'Средний', 'Продвинутый', 'Профи'],
+    equipmentEmpty: 'Для этого предмета оборудование пока не добавлено.',
+    stepsHelp: 'Добавляйте текст, изображения, видео и ссылки в нужном порядке.',
   }
 }
 
@@ -101,24 +118,19 @@ export default function LabForm({
   equipment,
   locale = 'ru',
 }: LabFormProps) {
+  const router = useRouter()
   const copy = getCopy(locale)
-  const [selectedEquipment, setSelectedEquipment] = useState<string[]>([])
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [subjectId, setSubjectId] = useState('')
+  const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<string[]>([])
+  const [steps, setSteps] = useState<LabStepDraft[]>([])
+  const [resources, setResources] = useState<Resource[]>([])
 
   const filteredEquipment = subjectId
     ? equipment.filter((eq) => eq.subject_id === subjectId)
     : equipment
-
-  const handleEquipmentToggle = (equipmentId: string) => {
-    setSelectedEquipment((prev) =>
-      prev.includes(equipmentId)
-        ? prev.filter((id) => id !== equipmentId)
-        : [...prev, equipmentId]
-    )
-  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -130,16 +142,17 @@ export default function LabForm({
     try {
       const formData = new FormData(event.currentTarget)
       formData.set('locale', locale)
-      formData.set('equipment_ids', JSON.stringify(selectedEquipment))
+      formData.set('equipment_ids', JSON.stringify(selectedEquipmentIds))
       formData.set('photos', JSON.stringify(selectedPhotos))
+      formData.set('steps', JSON.stringify(steps))
+      formData.set('resources', JSON.stringify(resources))
       formData.set('is_published', String(publish))
 
       await createLabAction(formData)
 
-      setSelectedEquipment([])
-      setSelectedPhotos([])
-      setSubjectId('')
-      event.currentTarget.reset()
+      // Redirect to labs list on success
+      router.push(adminPath('/labs'))
+      router.refresh()
     } catch (submissionError) {
       setError(submissionError instanceof Error ? submissionError.message : copy.error)
     } finally {
@@ -201,8 +214,47 @@ export default function LabForm({
                 ))}
               </select>
             </div>
+
+            <div className="form-field">
+              <Label htmlFor="difficulty">{copy.fields.difficulty}</Label>
+              <select id="difficulty" name="difficulty" className="form-select" defaultValue="">
+                <option value="">{copy.selects.difficulty}</option>
+                {(['beginner', 'intermediate', 'advanced', 'professional'] as const).map((value, index) => (
+                  <option key={value} value={value}>{copy.difficultyOptions[index]}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-field">
+              <Label htmlFor="duration_minutes">{copy.fields.duration}</Label>
+              <Input id="duration_minutes" name="duration_minutes" type="number" min={5} max={480} step={5} placeholder="45" />
+            </div>
           </div>
         </div>
+      </section>
+
+      <section className="admin-form-card">
+        <div className="admin-form-section-title">{copy.sections.equipment}</div>
+        {filteredEquipment.length === 0 ? (
+          <p className="text-sm text-[var(--muted)]">{copy.equipmentEmpty}</p>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-2">
+            {filteredEquipment.map((item) => {
+              const checked = selectedEquipmentIds.includes(item.id)
+              return (
+                <label key={item.id} className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold transition ${checked ? 'border-blue-300 bg-blue-50 text-[var(--primary)]' : 'border-[var(--border)] bg-white text-[var(--text)] hover:border-blue-200'}`}>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => setSelectedEquipmentIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])}
+                    className="h-4 w-4 accent-[var(--primary)]"
+                  />
+                  {item.name}
+                </label>
+              )
+            })}
+          </div>
+        )}
       </section>
 
       <section className="admin-form-card">
@@ -221,6 +273,12 @@ export default function LabForm({
       </section>
 
       <section className="admin-form-card">
+        <div className="admin-form-section-title">{copy.sections.steps}</div>
+        <p className="mb-5 text-sm leading-6 text-[var(--muted)]">{copy.stepsHelp}</p>
+        <StepBuilder steps={steps} onChange={setSteps} locale={locale} />
+      </section>
+
+      <section className="admin-form-card">
         <div className="admin-form-section-title">{copy.sections.photos}</div>
 
         <EquipmentPhotoBrowser 
@@ -230,74 +288,32 @@ export default function LabForm({
         />
       </section>
 
-      <section className="admin-form-card">
-        <div className="admin-form-section-title">{copy.sections.equipment}</div>
-
-        {!subjectId ? (
-          <p className="text-gray-500 text-sm">
-            Сначала выберите предмет, чтобы увидеть доступное оборудование.
-          </p>
-        ) : filteredEquipment.length === 0 ? (
-          <p className="text-gray-500 text-sm">
-            Для этого предмета нет оборудования.
-          </p>
-        ) : (
-          <div className="space-y-3">
-            <p className="text-sm text-gray-600">
-              Выберите оборудование, которое будет использоваться в этой лабораторной работе
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredEquipment.map((item) => (
-                <div
-                  key={item.id}
-                  className="border-2 rounded-lg p-3 cursor-pointer transition"
-                  style={{
-                    borderColor: selectedEquipment.includes(item.id)
-                      ? '#3b82f6'
-                      : '#e5e7eb',
-                    backgroundColor: selectedEquipment.includes(item.id)
-                      ? '#eff6ff'
-                      : 'white',
-                  }}
-                  onClick={() => handleEquipmentToggle(item.id)}
-                >
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedEquipment.includes(item.id)}
-                      onChange={() => {}}
-                      className="mt-1"
-                    />
-                    <div>
-                      <p className="font-medium">{item.name}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div role="alert" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
       )}
 
       <section className="admin-form-card">
-        <ResourcesManager labId="new-lab" locale={locale} />
+        <ResourcesManager
+          labId="new-lab"
+          resources={resources}
+          onChange={setResources}
+          locale={locale}
+        />
       </section>
 
       <section className="admin-form-card">
         <div className="admin-form-section-title">{copy.sections.publish}</div>
         <p className="text-sm text-gray-600 mb-4">{copy.publishText}</p>
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Button
             type="submit"
             data-publish="false"
             variant="outline"
             disabled={loading}
+            className="w-full sm:w-auto"
           >
             {loading ? copy.saving : copy.saveDraft}
           </Button>
@@ -305,6 +321,7 @@ export default function LabForm({
             type="submit"
             data-publish="true"
             disabled={loading}
+            className="w-full sm:w-auto"
           >
             {loading ? copy.saving : copy.publish}
           </Button>

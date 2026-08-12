@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Image as ImageIcon } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import ResponsiveImage from '@/components/ResponsiveImage'
 import type { Equipment, Locale } from '@/types'
 
 interface EquipmentPhotoBrowserProps {
@@ -46,36 +46,58 @@ export default function EquipmentPhotoBrowser({
   locale = 'ru',
 }: EquipmentPhotoBrowserProps) {
   const copy = getCopy(locale)
-  const [selectedEquipment, setSelectedEquipment] = useState('')
+  const [selectedEquipmentId, setSelectedEquipmentId] = useState('')
   const [photos, setPhotos] = useState<Photo[]>([])
   const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
+  const onPhotosSelectRef = useRef(onPhotosSelect)
+  onPhotosSelectRef.current = onPhotosSelect
+
+  // Store equipment in ref to use latest data without triggering re-render
+  const equipmentRef = useRef(equipment)
+  equipmentRef.current = equipment
 
   useEffect(() => {
-    if (!selectedEquipment) {
+    if (!selectedEquipmentId) {
       setPhotos([])
       setSelectedPhotos(new Set())
-      onPhotosSelect?.([])
       return
     }
+
+    // Look up equipment name at execution time using ref (stable reference)
+    const equipmentName = equipmentRef.current.find((item) => item.id === selectedEquipmentId)?.name ?? ''
+
+    if (!equipmentName) {
+      setPhotos([])
+      setSelectedPhotos(new Set())
+      return
+    }
+
+    let cancelled = false
 
     const fetchPhotos = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`/api/photos?equipment=${encodeURIComponent(selectedEquipment)}`)
+        const response = await fetch(`/api/photos?equipment=${encodeURIComponent(equipmentName)}`)
         const data = await response.json()
+        if (cancelled) return
         setPhotos(data.photos || [])
-        setSelectedPhotos(new Set())
+        // Don't reset selectedPhotos — preserve user's selection
       } catch (error) {
         console.error('Failed to fetch photos:', error)
+        if (cancelled) return
         setPhotos([])
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
 
     fetchPhotos()
-  }, [selectedEquipment, onPhotosSelect])
+
+    return () => {
+      cancelled = true
+    }
+  }, [selectedEquipmentId])
 
   const handlePhotoSelect = (photo: Photo, isSelected: boolean) => {
     const newSelected = new Set(selectedPhotos)
@@ -116,14 +138,14 @@ export default function EquipmentPhotoBrowser({
         </label>
         <select
           id="equipment_photos"
-          value={selectedEquipment}
-          onChange={(e) => setSelectedEquipment(e.target.value)}
+          value={selectedEquipmentId}
+          onChange={(e) => setSelectedEquipmentId(e.target.value)}
           className="form-select w-full"
         >
           <option value="">{copy.selectEquipment}</option>
           {equipment.length > 0 ? (
             equipment.map((item) => (
-              <option key={item.id} value={item.name || item.id}>
+              <option key={item.id} value={item.id}>
                 {getEquipmentFolderName(item)}
               </option>
             ))
@@ -133,7 +155,7 @@ export default function EquipmentPhotoBrowser({
         </select>
       </div>
 
-      {selectedEquipment && (
+      {selectedEquipmentId && (
         <div className="space-y-3">
           {loading ? (
             <div className="text-gray-500 text-sm">{copy.loading}</div>
@@ -171,37 +193,34 @@ export default function EquipmentPhotoBrowser({
                   const photoNameWithoutExt = photo.name.replace(/\.[^.]+$/, '')
                   
                   return (
-                    <div
+                    <label
                       key={photo.path}
-                      className="relative group cursor-pointer"
-                      onClick={() => handlePhotoSelect(photo, !isSelected)}
+                      className="group relative cursor-pointer"
                     >
                       <div
-                        className="relative bg-gray-100 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center"
+                        className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg border-2 bg-gray-100 transition-all"
                         style={{
                           borderColor: isSelected ? '#3b82f6' : '#e5e7eb',
                           backgroundColor: isSelected ? '#eff6ff' : '#f3f4f6',
-                          width: '100%',
-                          aspectRatio: '1',
                         }}
                       >
-                        <img
+                        <ResponsiveImage
                           src={photo.path}
                           alt={photoNameWithoutExt}
-                          className="w-full h-full object-contain p-1"
+                          sizes="(max-width: 768px) 50vw, 25vw"
+                          className="h-full w-full object-contain p-1"
                         />
                         <input
                           type="checkbox"
                           checked={isSelected}
-                          onChange={() => {}}
-                          className="absolute top-2 left-2 w-4 h-4 cursor-pointer"
-                          onClick={(e) => e.stopPropagation()}
+                          onChange={(event) => handlePhotoSelect(photo, event.target.checked)}
+                          className="absolute left-2 top-2 h-4 w-4 cursor-pointer"
                         />
                       </div>
-                      <p className="text-xs text-gray-600 mt-2 truncate" title={photoNameWithoutExt}>
+                      <span className="mt-2 block truncate text-xs text-gray-600" title={photoNameWithoutExt}>
                         {photoNameWithoutExt}
-                      </p>
-                    </div>
+                      </span>
+                    </label>
                   )
                 })}
               </div>

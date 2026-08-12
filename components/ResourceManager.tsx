@@ -22,7 +22,7 @@ function getCopy(locale: Locale) {
     return {
       resourceTypes: {
         pdf: 'PDF',
-        worksheet: 'Жумуш барагы',
+        worksheet: 'Документ / SPARKlab',
         image: 'Сүрөт',
         video: 'Видео',
         link: 'Шилтеме',
@@ -49,19 +49,26 @@ function getCopy(locale: Locale) {
           icon: <Video size={18} />,
           helper: 'Лаборатория үчүн жергиликтүү MP4 же WebM',
         },
+        {
+          type: 'worksheet' as const,
+          label: 'SPARKlab жүктөө',
+          accept: '.spklab',
+          icon: <FileText size={18} />,
+          helper: 'PASCO SPARKvue үчүн .spklab лаборатория файлы',
+        },
       ],
       addLink: 'Шилтеме кошуу',
       videoLink: 'Шилтеме менен видео',
       title: 'Материалдар жана видео',
       intro:
-        'Бул жерге PDF, сүрөттөр, жергиликтүү видеолор жана кадимки шилтемелер сакталат. Файлдардын өзү сервер компьютерде, ал эми жергиликтүү базада алардын жазуулары гана сакталат.',
+        'Бул жерге PDF, сүрөттөр, жергиликтүү видеолор, PASCO SPARKlab файлдары жана кадимки шилтемелер сакталат. Файлдардын өзү сервер компьютерде, ал эми жергиликтүү базада алардын жазуулары гана сакталат.',
       storageTitle: 'Видео жана документтер кайда сакталат',
       storageText:
         'Файл долбоордун папкасында жергиликтүү сакталат, ал эми ал жөнүндө жазуу `data/local-db` файлдарында болот.',
       chooseFile: 'Файл тандоо',
       uploading: 'Жүктөлүүдө...',
       empty:
-        'Азырынча материалдар кошула элек. Видео, PDF же сүрөт жүктөңүз же шилтеме кошуңуз.',
+        'Азырынча материалдар кошула элек. Видео, PDF, сүрөт же SPARKlab файлын жүктөңүз же шилтеме кошуңуз.',
       manualLink: 'Жаңы шилтеме',
       manualVideo: 'Шилтеме менен видео',
       manualDefault: 'Жаңы материал',
@@ -77,7 +84,7 @@ function getCopy(locale: Locale) {
   return {
     resourceTypes: {
       pdf: 'PDF',
-      worksheet: 'Рабочий лист',
+      worksheet: 'Документ / SPARKlab',
       image: 'Изображение',
       video: 'Видео',
       link: 'Ссылка',
@@ -104,19 +111,26 @@ function getCopy(locale: Locale) {
         icon: <Video size={18} />,
         helper: 'Локальный MP4 или WebM для лабораторной',
       },
+      {
+        type: 'worksheet' as const,
+        label: 'Загрузить SPARKlab',
+        accept: '.spklab',
+        icon: <FileText size={18} />,
+        helper: 'Файл лаборатории .spklab для PASCO SPARKvue',
+      },
     ],
     addLink: 'Добавить ссылку',
     videoLink: 'Видео по ссылке',
     title: 'Материалы и видео',
     intro:
-      'Здесь можно хранить PDF, изображения, локальные видео и обычные ссылки. Файлы сохраняются на компьютере сервера, а в локальной базе остаются только их записи.',
+      'Здесь можно хранить PDF, изображения, локальные видео, PASCO SPARKlab и обычные ссылки. Файлы сохраняются на компьютере сервера, а в локальной базе остаются только их записи.',
     storageTitle: 'Куда сохраняются видео и документы',
     storageText:
       'Сам файл лежит локально в папке проекта, а запись о нём сохраняется в `data/local-db`.',
     chooseFile: 'Нажмите, чтобы выбрать файл',
     uploading: 'Загрузка...',
     empty:
-      'Пока материалы не добавлены. Загрузите видеофайл, PDF, изображение или добавьте ссылку.',
+      'Пока материалы не добавлены. Загрузите видео, PDF, изображение, SPARKlab или добавьте ссылку.',
     manualLink: 'Новая ссылка',
     manualVideo: 'Видео по ссылке',
     manualDefault: 'Новый материал',
@@ -200,7 +214,7 @@ export default function ResourceManager({
 
   const handleUpload = async (
     event: ChangeEvent<HTMLInputElement>,
-    type: Extract<ResourceType, 'pdf' | 'image' | 'video'>
+    type: Extract<ResourceType, 'pdf' | 'image' | 'video' | 'worksheet'>
   ) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -278,7 +292,7 @@ export default function ResourceManager({
         </div>
       </div>
 
-      <div className="mb-6 grid gap-4 md:grid-cols-3">
+      <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {copy.uploads.map((target) => (
           <div
             key={target.type}

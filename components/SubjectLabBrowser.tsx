@@ -3,7 +3,9 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight, Sparkles } from 'lucide-react'
+import ResponsiveImage from '@/components/ResponsiveImage'
 import { pluralizeLabs } from '@/lib/content'
+import { getLabPhotoUrl } from '@/lib/lab-photo-url'
 import type { Grade, Lab, Locale, Subject } from '@/types'
 
 interface SubjectLabBrowserProps {
@@ -149,15 +151,27 @@ function LabTopicList({ labs, locale }: { labs: Lab[]; locale: Locale }) {
     <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_16px_44px_rgba(15,23,42,0.05)]">
       {labs.map((lab, index) => {
         const title = lab.title || copy.noTopic
+        const imageUrl = getLabPhotoUrl(lab)
 
         return (
           <Link
             key={lab.id}
             href={`/labs/${lab.slug}`}
-            className="group grid gap-4 border-b border-slate-200 px-5 py-5 transition last:border-b-0 hover:bg-slate-50 md:grid-cols-[72px_1fr_auto] md:items-center"
+            className="group grid gap-4 border-b border-slate-200 px-5 py-5 transition last:border-b-0 hover:bg-slate-50 md:grid-cols-[96px_1fr_auto] md:items-center"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-sm font-bold text-[#1647c5]">
-              {String(index + 1).padStart(2, '0')}
+            <div className="relative h-20 w-full overflow-hidden rounded-2xl bg-blue-50 md:h-16 md:w-20">
+              {imageUrl ? (
+                <ResponsiveImage
+                  src={imageUrl}
+                  alt={title}
+                  sizes="96px"
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.035]"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-sm font-bold text-[#1647c5]">
+                  {String(index + 1).padStart(2, '0')}
+                </div>
+              )}
             </div>
 
             <div className="min-w-0">

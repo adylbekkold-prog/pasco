@@ -1,25 +1,123 @@
-// D:\pasco-lab-portal\app\(public)\pasco-kits\[slug]\page.tsx
 import Link from 'next/link'
-import { ArrowLeft, Package } from 'lucide-react'
-import { getCurrentLocale } from '@/lib/locale-server'
-import { getLocalPascoKitBySlug, getLocalSubjects } from '@/lib/local-db'
-import { Button } from '@/components/ui/button'
+import type { Metadata } from 'next'
+import { ArrowLeft, Boxes, MapPin, PackageOpen } from 'lucide-react'
 import { notFound } from 'next/navigation'
+import ResponsiveImage from '@/components/ResponsiveImage'
+import { getSiteDescription } from '@/lib/content'
+import { getCurrentLocale } from '@/lib/locale-server'
+import { getLocalSubjects } from '@/lib/local-db'
+import { getPascoKitBySlug } from '@/lib/queries'
 import { getPublicCopy } from '@/lib/i18n/public'
 
+import { getPascoComponentAnchor } from '@/lib/pasco-kit-photo-links'
+import { getSeoDescription } from '@/lib/seo'
+
 export const dynamic = 'force-dynamic'
-interface KitDetailPageProps { params: Promise<{ slug: string }> }
-async function KitDetailPage(props: KitDetailPageProps) {
+
+interface KitDetailPageProps {
+  params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: KitDetailPageProps): Promise<Metadata> {
   const locale = await getCurrentLocale()
-  const params = await props.params
+  const { slug } = await params
+  const kit = await getPascoKitBySlug(slug, locale)
+
+
+  if (!kit) {
+    return {
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }
+  }
+
+  const description = getSeoDescription(kit.description, getSiteDescription(locale))
+
+  return {
+    title: kit.name,
+    description,
+    alternates: {
+      canonical: `/pasco-kits/${kit.slug}`,
+    },
+    openGraph: {
+      title: kit.name,
+      description,
+      type: 'article',
+      images: kit.thumbnail_url ? [{ url: kit.thumbnail_url, alt: kit.name }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: kit.name,
+      description,
+      images: kit.thumbnail_url ? [kit.thumbnail_url] : undefined,
+    },
+  }
+}
+
+export default async function KitDetailPage({ params }: KitDetailPageProps) {
+  const locale = await getCurrentLocale()
+  const { slug } = await params
   const copy = getPublicCopy(locale, 'pascoKitDetail')
-  const [kit, subjects] = await Promise.all([getLocalPascoKitBySlug(params.slug, locale), getLocalSubjects(locale)])
+  const [kit, subjects] = await Promise.all([
+    getPascoKitBySlug(slug, locale),
+    getLocalSubjects(locale),
+  ])
+
+
   if (!kit) notFound()
-  const subject = subjects.find(s => s.id === kit.subject_id)
+  const subject = subjects.find((item) => item.id === kit.subject_id)
+
   return (
-    <div className="space-y-8"><div><Link href="/pasco-kits"><Button variant="outline" className="gap-2 mb-4"><ArrowLeft size={18} />{copy.backToCatalog}</Button></Link></div>
-    <div className="rounded-lg border border-gray-200 bg-white p-8"><div className="grid gap-8 md:grid-cols-3"><div className="md:col-span-1">{kit.thumbnail_url ? <img src={kit.thumbnail_url} alt={kit.name} className="w-full rounded-lg object-cover" /> : <div className="aspect-square flex items-center justify-center rounded-lg bg-gray-100"><Package size={48} className="text-gray-400" /></div>}</div><div className="md:col-span-2 space-y-4"><div><h1 className="text-3xl font-bold">{kit.name}</h1>{subject && <p className="mt-2 text-lg text-gray-600">{subject.icon} {subject.name}</p>}</div>{kit.description && <div><h2 className="font-semibold mb-2">Описание</h2><p className="text-gray-700 whitespace-pre-line">{kit.description}</p></div>}<div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg"><div><p className="text-sm text-gray-600">{copy.components}</p><p className="text-2xl font-bold">{kit.components?.length || 0}</p></div></div></div></div></div>
-    <div className="space-y-4"><h2 className="text-2xl font-bold">{copy.components}</h2>{!kit.components || kit.components.length === 0 ? <div className="rounded-lg border border-gray-200 bg-gray-50 p-12 text-center"><Package size={32} className="mx-auto mb-4 text-gray-400" /><p className="text-gray-600">{copy.noComponents}</p></div> : <div className="grid gap-4">{kit.components.map(component => (<div key={component.id} className="rounded-lg border border-gray-200 bg-white p-6 hover:shadow-md transition-shadow"><div className="grid gap-6 md:grid-cols-3">{component.photo_url ? <div className="md:col-span-1"><img src={component.photo_url} alt={component.name} className="w-full rounded-lg object-cover" /></div> : <div className="md:col-span-1 aspect-square flex items-center justify-center rounded-lg bg-gray-100"><Package size={32} className="text-gray-400" /></div>}<div className="md:col-span-2 space-y-3"><div className="flex items-start justify-between"><h3 className="text-lg font-semibold">{component.name}</h3><span className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">×{component.quantity}</span></div>{component.description && <div><p className="text-sm font-medium text-gray-700">{copy.description}</p><p className="text-gray-600">{component.description}</p></div>}{component.storage_location && <div><p className="text-sm font-medium text-gray-700">{copy.storageLocation}</p><p className="text-gray-600">📦 {component.storage_location}</p></div>}{component.notes && <div><p className="text-sm font-medium text-gray-700">{copy.notes}</p><p className="text-gray-600">{component.notes}</p></div>}</div></div></div>))}</div>}</div></div>
+    <div className="page-container pb-20 pt-8">
+      <Link href="/pasco-kits" className="button-secondary"><ArrowLeft size={16} />{copy.backToCatalog}</Link>
+
+      <section className="mt-6 overflow-hidden rounded-[30px] border border-[var(--border)] bg-white shadow-[var(--shadow-md)]">
+        <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="relative min-h-72 bg-white lg:min-h-[480px]">
+            {kit.thumbnail_url ? (
+              <ResponsiveImage src={kit.thumbnail_url} alt={kit.name} priority sizes="(max-width: 1024px) 100vw, 45vw" className="h-full w-full object-contain p-6" />
+            ) : (
+              <div className="flex h-full min-h-72 items-center justify-center bg-[radial-gradient(circle_at_75%_20%,rgba(29,87,200,0.2),transparent_38%),linear-gradient(145deg,#f8fbff,#eef3f8)]"><span className="flex h-24 w-24 items-center justify-center rounded-[30px] bg-white text-[var(--primary)] shadow-[var(--shadow-md)]"><PackageOpen size={38} /></span></div>
+            )}
+          </div>
+          <div className="p-7 md:p-10">
+            {subject && <span className="section-eyebrow">{subject.icon} {subject.name}</span>}
+            <h1 className="mt-5 text-4xl font-bold tracking-[-0.05em] md:text-5xl">{kit.name}</h1>
+            {kit.description && <div className="mt-7"><h2 className="text-sm font-bold uppercase tracking-[0.12em] text-[var(--muted)]">{copy.description}</h2><p className="mt-3 whitespace-pre-line text-base leading-8 text-slate-700">{kit.description}</p></div>}
+            <div className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-slate-100 px-5 py-4">
+              <Boxes size={21} className="text-[var(--primary)]" />
+              <div><div className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted)]">{copy.components}</div><div className="mt-1 text-2xl font-bold">{kit.components?.length || 0}</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <div className="flex items-end justify-between gap-4"><div><span className="section-eyebrow">PASCO</span><h2 className="mt-4 text-3xl font-bold tracking-[-0.04em]">{copy.components}</h2></div></div>
+        {!kit.components?.length ? (
+          <div className="surface-card mt-6 border-dashed px-6 py-14 text-center text-[var(--muted)]"><PackageOpen size={32} className="mx-auto mb-4" />{copy.noComponents}</div>
+        ) : (
+          <div className="mt-6 grid gap-5 md:grid-cols-2">
+            {kit.components.map((component) => (
+              <article key={component.id} id={getPascoComponentAnchor(component.id)} className="surface-card scroll-mt-28 overflow-hidden">
+                <div className="grid h-full sm:grid-cols-[180px_1fr]">
+                  <div className="relative min-h-44 bg-white">
+                    {component.photo_url ? <ResponsiveImage src={component.photo_url} alt={component.name} className="h-full w-full object-contain p-4" sizes="(max-width: 640px) 100vw, 180px" /> : <div className="flex h-full min-h-44 items-center justify-center bg-slate-100 text-slate-400"><PackageOpen size={32} /></div>}
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3"><h3 className="text-lg font-bold">{component.name}</h3><span className="shrink-0 rounded-full bg-blue-50 px-3 py-1 text-sm font-bold text-[var(--primary)]">x{component.quantity}</span></div>
+                    {component.description && <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{component.description}</p>}
+                    {component.storage_location && <div className="mt-4 inline-flex items-start gap-2 text-sm font-semibold text-slate-600"><MapPin size={15} className="mt-0.5 shrink-0 text-[var(--primary)]" />{component.storage_location}</div>}
+                    {component.notes && <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">{component.notes}</p>}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
   )
 }
-export default KitDetailPage

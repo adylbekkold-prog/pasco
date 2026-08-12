@@ -16,7 +16,7 @@ export const CreateLabSchema = z.object({
   grade_id: z.string().nullable().optional(),
   equipment_id: z.string().nullable().optional(),
   duration_minutes: z.number().int().min(5).max(480).nullable().optional(),
-  difficulty: z.enum(['beginner', 'intermediate', 'advanced']).nullable().optional(),
+  difficulty: z.enum(['beginner', 'intermediate', 'advanced', 'professional']).nullable().optional(),
   is_published: z.boolean().default(false),
 })
 

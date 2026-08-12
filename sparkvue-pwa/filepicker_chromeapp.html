@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' blob: data:; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-src 'self' blob: data:; img-src 'self' data: blob:; media-src 'self' data: blob:; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:;">
+  <script type="text/javascript">
+    window.filepicker = {
+      setKey: function () {},
+      pick: function (_options, success, failure) {
+        if (typeof failure === 'function') {
+          failure({ code: 'offline' });
+        } else if (typeof success === 'function') {
+          success('error');
+        }
+      },
+      exportFile: function (_uploadedFilePath, _options, success, failure) {
+        if (typeof failure === 'function') {
+          failure({ code: 'offline' });
+        } else if (typeof success === 'function') {
+          success('error');
+        }
+      },
+    };
+
+    window.initializeFilePicker = function (callback) {
+      if (typeof callback === 'function') {
+        callback();
+      }
+    };
+
+    window.pickFile = function (callback) {
+      if (typeof callback === 'function') {
+        callback('error');
+      }
+    };
+
+    window.exportFile = function (_uploadedFilePath, callback) {
+      if (typeof callback === 'function') {
+        callback('error');
+      }
+    };
+  </script>
+</head>
+<body></body>
+</html>
