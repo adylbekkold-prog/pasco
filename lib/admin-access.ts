@@ -58,6 +58,8 @@ export function isAllowedLocalAdminHost(host: string | null | undefined) {
     process.env.NEXT_PUBLIC_ADMIN_HOST,
     process.env.ADMIN_HOST,
     process.env.VPS_HOST,
+    process.env.PUBLIC_ADMIN_HOST,
+    process.env.NEXT_PUBLIC_SITE_URL,
   ].filter(Boolean) as string[]
 
   return (
@@ -66,6 +68,7 @@ export function isAllowedLocalAdminHost(host: string | null | undefined) {
     allowedHosts.some((allowedHost) => normalizeHost(allowedHost) === normalized)
   )
 }
+
 
 export function isAllowedLocalAdminRequest(request: NextRequest) {
   const xForwardedHost = request.headers.get('x-forwarded-host')

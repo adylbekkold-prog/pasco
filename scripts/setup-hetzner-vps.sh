@@ -15,30 +15,44 @@ set -euo pipefail
 
 # ============================================================
 # 1. ПЕРЕМЕННЫЕ (заполни своими значениями!)
+#
+# ⚠️ ВАЖНО: НЕ вписывай реальные пароли прямо в этот файл!
+# Файл лежит в Git и попадёт в GitHub. Задай значения через
+# переменные окружения перед запуском скрипта, например:
+#
+#   export DOMAIN=89.167.118.180
+#   export CERTBOT_EMAIL=you@example.com
+#   export DB_PASSWORD='СЛОЖНЫЙ_ПАРОЛЬ'
+#   export ADMIN_PASSWORD='СЛОЖНЫЙ_ПАРОЛЬ'
+#   export ADMIN_SESSION_SECRET='СЛУЧАЙНАЯ_СТРОКА'
+#   bash setup-hetzner-vps.sh
+#
+# Или создай файл .env.deploy (он в .gitignore) и запусти:
+#   set -a; source .env.deploy; set +a; bash setup-hetzner-vps.sh
 # ============================================================
 REPO_URL="https://github.com/adylbekkold-prog/pasco.git"
 BRANCH="main"
 APP_DIR="/var/www/pasco-lab-portal"
 
-DOMAIN=89.167.118.180
-CERTBOT_EMAIL=adylbekkold@gmail.com
+# Заполняются из переменных окружения (см. выше). Не хардкодь здесь!
+DOMAIN="${DOMAIN:-}"
+CERTBOT_EMAIL="${CERTBOT_EMAIL:-}"
 
-DB_NAME="pasco"
-DB_USER="pasco_user"
-DB_PASSWORD="CHANGE_ME_DB_PASSWORD"
+DB_NAME="${DB_NAME:-pasco}"
+DB_USER="${DB_USER:-pasco_user}"
+DB_PASSWORD="${DB_PASSWORD:-}"
 
-ADMIN_PASSWORD="CHANGE_ME_ADMIN_PASSWORD"
-ADMIN_SESSION_SECRET="CHANGE_ME_ADMIN_SESSION_SECRET"
-
-
-
+ADMIN_PASSWORD="${ADMIN_PASSWORD:-}"
+ADMIN_SESSION_SECRET="${ADMIN_SESSION_SECRET:-}"
 
 # Проверка обязательных переменных
 if [ -z "$DOMAIN" ] || [ -z "$CERTBOT_EMAIL" ] || [ -z "$DB_PASSWORD" ] || [ -z "$ADMIN_PASSWORD" ] || [ -z "$ADMIN_SESSION_SECRET" ]; then
-  echo "❌ ОШИБКА: Заполни обязательные переменные в начале скрипта!"
+  echo "❌ ОШИБКА: Не заданы обязательные переменные окружения!"
   echo "   DOMAIN, CERTBOT_EMAIL, DB_PASSWORD, ADMIN_PASSWORD, ADMIN_SESSION_SECRET"
+  echo "   Задай их через export или .env.deploy (см. комментарий в начале скрипта)."
   exit 1
 fi
+
 
 echo "=============================================="
 echo "🚀 НАСТРОЙКА HETZNER VPS ДЛЯ PASCO LAB PORTAL"
@@ -152,9 +166,11 @@ NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
 NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
 SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
 NEXT_PUBLIC_ADMIN_HOST=${DOMAIN}
+PUBLIC_ADMIN_HOST=${DOMAIN}
 SITE_URL=https://${DOMAIN}
 NEXT_PUBLIC_SITE_URL=https://${DOMAIN}
 EOF
+
 
 echo "✅ .env.local создан"
 
