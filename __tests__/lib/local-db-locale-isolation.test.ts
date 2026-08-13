@@ -215,14 +215,16 @@ describe('local database locale isolation', () => {
     expect(kits.flatMap((kit) => kit.components ?? []).some((component) => component.id === 'comp-mech-1')).toBe(false)
   })
 
-  it('does not overwrite a corrupt locale database with defaults', async () => {
+  it('recovers a corrupt locale database with defaults instead of crashing', async () => {
     mockedReadFile.mockResolvedValue('{ broken json')
 
-    await expect(getLocalLabs({ adminMode: true }, 'ru')).rejects.toThrow(
-      'Файл не был перезаписан'
-    )
-    expect(mockedWriteFile).not.toHaveBeenCalled()
+    // Повреждённый файл не должен ронять страницу — вместо этого
+    // база безопасно восстанавливается из дефолта.
+    const labs = await getLocalLabs({ adminMode: true }, 'ru')
+    expect(labs).toEqual([])
+    expect(mockedWriteFile).toHaveBeenCalled()
   })
+
 
   it('uses Russian PASCO kit assets as a public fallback only when requested', async () => {
     mockedReadFile.mockImplementation(async (filePath) => {

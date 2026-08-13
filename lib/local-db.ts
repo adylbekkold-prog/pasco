@@ -792,21 +792,18 @@ async function readLocalDb(locale: Locale): Promise<LocalDb> {
   const raw = await readFile(/*turbopackIgnore: true*/ filePath, 'utf8')
 
   try {
-    const normalized = normalizeDb(JSON.parse(raw) as Partial<LocalDb>, locale)
-    const serialized = `${JSON.stringify(normalized, null, 2)}\n`
-
-    if (raw !== serialized) {
-      await writeFile(/*turbopackIgnore: true*/ filePath, serialized, 'utf8')
-    }
-
-    return normalized
+    return normalizeDb(JSON.parse(raw) as Partial<LocalDb>, locale)
   } catch (error) {
     console.error(`[local-db] Failed to read ${locale} database:`, error)
-    throw new Error(
-      `Не удалось прочитать локальную базу ${locale}. Файл не был перезаписан, чтобы не потерять данные.`
-    )
+    // Файл повреждён — не падаем, а безопасно восстанавливаем из дефолта.
+    // Запись восстановленного файла выполняется через очередь (writeLocalDb),
+    // чтобы не создавать гонку с другими записями.
+    const recovered = getDefaultDb(locale)
+    await writeLocalDb(recovered, locale)
+    return recovered
   }
 }
+
 
 async function writeLocalDb(db: LocalDb, locale: Locale) {
   const filePath = getDbFilePath(locale)
