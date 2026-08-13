@@ -331,14 +331,17 @@ async function loadRelations(labs: LabRow[], locale?: Locale) {
   }))
 }
 
-async function fetchRemoteSubjects() {
+async function fetchRemoteSubjects(locale: Locale = 'ru') {
   if (getDataProvider() === 'postgresql') {
     return (await queryPostgres<Record<string, unknown>>(
       `SELECT id, slug, name, name_ru, name_ky, icon, color, sort_order
        FROM subjects
-       ORDER BY sort_order`
+       ORDER BY sort_order`,
+      [],
+      locale
     )).map(normalizeSubject)
   }
+
 
   const supabase = await createClient()
   const { data, error } = await supabase.from('subjects').select('*').order('sort_order')
@@ -350,14 +353,17 @@ async function fetchRemoteSubjects() {
   return (data ?? []) as Subject[]
 }
 
-async function fetchRemoteGrades() {
+async function fetchRemoteGrades(locale: Locale = 'ru') {
   if (getDataProvider() === 'postgresql') {
     return (await queryPostgres<Record<string, unknown>>(
       `SELECT id, level, label, label_ru, label_ky
        FROM grades
-       ORDER BY level`
+       ORDER BY level`,
+      [],
+      locale
     )).map(normalizeGrade)
   }
+
 
   const supabase = await createClient()
   const { data, error } = await supabase.from('grades').select('*').order('level')
@@ -369,14 +375,17 @@ async function fetchRemoteGrades() {
   return (data ?? []) as Grade[]
 }
 
-async function fetchRemoteEquipment() {
+async function fetchRemoteEquipment(locale: Locale = 'ru') {
   if (getDataProvider() === 'postgresql') {
     return (await queryPostgres<Record<string, unknown>>(
       `SELECT id, slug, name, name_ru, name_ky, subject_id
        FROM equipment
-       ORDER BY name`
+       ORDER BY name`,
+      [],
+      locale
     )).map(normalizeEquipment)
   }
+
 
   const supabase = await createClient()
   const { data, error } = await supabase.from('equipment').select('*').order('name')
@@ -388,17 +397,20 @@ async function fetchRemoteEquipment() {
   return (data ?? []) as Equipment[]
 }
 
-async function fetchRemoteLabs({
-  subjectSlug,
-  gradeLevel,
-  search,
-  adminMode = false,
-}: {
-  subjectSlug?: string
-  gradeLevel?: number
-  search?: string
-  adminMode?: boolean
-}) {
+async function fetchRemoteLabs(
+  {
+    subjectSlug,
+    gradeLevel,
+    search,
+    adminMode = false,
+  }: {
+    subjectSlug?: string
+    gradeLevel?: number
+    search?: string
+    adminMode?: boolean
+  },
+  locale: Locale = 'ru'
+) {
   if (getDataProvider() === 'postgresql') {
     const whereClauses: string[] = []
     const params: unknown[] = []
@@ -411,7 +423,8 @@ async function fetchRemoteLabs({
     if (subjectSlug) {
       const subject = await queryPostgres<{ id: string }>(
         `SELECT id FROM subjects WHERE slug = $1 LIMIT 1`,
-        [subjectSlug]
+        [subjectSlug],
+        locale
       )
 
       if (subject.length === 0) return [] as LabRow[]
@@ -423,8 +436,10 @@ async function fetchRemoteLabs({
     if (gradeLevel) {
       const grade = await queryPostgres<{ id: string }>(
         `SELECT id FROM grades WHERE level = $1 LIMIT 1`,
-        [gradeLevel]
+        [gradeLevel],
+        locale
       )
+
 
       if (grade.length === 0) return [] as LabRow[]
 
@@ -538,11 +553,13 @@ async function fetchRemoteLabs({
        FROM labs
        ${whereSql}
        ORDER BY created_at DESC`,
-      params
+      params,
+      locale
     )
 
     return rows.map(normalizeLabRow)
   }
+
 
   const supabase = await createClient()
 
@@ -613,8 +630,10 @@ async function fetchRemoteLab(
        FROM labs
        WHERE ${field} = $1
        LIMIT 1`,
-      [value]
+      [value],
+      locale
     )
+
 
     if (labRows.length === 0) {
       throw createNotFoundError('Лаборатория не найдена.')
@@ -635,22 +654,26 @@ async function fetchRemoteLab(
          FROM lab_steps
          WHERE lab_id = $1
          ORDER BY step_order`,
-        [lab.id]
+        [lab.id],
+        locale
       ),
       queryPostgres<Record<string, unknown>>(
         `SELECT id, lab_id, resource_type, title, title_ru, title_ky, description, description_ru, description_ky, url, file_size, sort_order
          FROM resources
          WHERE lab_id = $1
          ORDER BY sort_order`,
-        [lab.id]
+        [lab.id],
+        locale
       ),
       queryPostgres<Record<string, unknown>>(
         `SELECT id, lab_id, item_name, item_name_ru, item_name_ky, quantity, notes, notes_ru, notes_ky, sort_order
          FROM lab_equipment_items
          WHERE lab_id = $1
          ORDER BY sort_order`,
-        [lab.id]
+        [lab.id],
+        locale
       ),
+
     ])
 
     return {
@@ -755,7 +778,8 @@ export async function getSubjects(locale?: Locale): Promise<Subject[]> {
   }
 
   try {
-    const subjects = localizeRemoteSubjects(await fetchRemoteSubjects(), currentLocale, localSubjects)
+    const subjects = localizeRemoteSubjects(await fetchRemoteSubjects(currentLocale), currentLocale, localSubjects)
+
 
     if (shouldMirrorLocalData(provider)) {
       await syncLocalCatalogs({ subjects }, currentLocale)
@@ -790,7 +814,8 @@ export async function getGrades(locale?: Locale): Promise<Grade[]> {
   }
 
   try {
-    const grades = localizeRemoteGrades(await fetchRemoteGrades(), currentLocale, localGrades)
+    const grades = localizeRemoteGrades(await fetchRemoteGrades(currentLocale), currentLocale, localGrades)
+
 
     if (shouldMirrorLocalData(provider)) {
       await syncLocalCatalogs({ grades }, currentLocale)
@@ -826,10 +851,11 @@ export async function getEquipment(locale?: Locale): Promise<Equipment[]> {
 
   try {
     const equipment = localizeRemoteEquipment(
-      await fetchRemoteEquipment(),
+      await fetchRemoteEquipment(currentLocale),
       currentLocale,
       localEquipment
     )
+
 
     if (shouldMirrorLocalData(provider)) {
       await syncLocalCatalogs({ equipment }, currentLocale)
@@ -878,7 +904,8 @@ export async function getLabs({
 
   try {
     await flushPendingLabSync(currentLocale)
-    const remoteRows = localizeRemoteLabs(await fetchRemoteLabs(params), currentLocale, localLabs)
+    const remoteRows = localizeRemoteLabs(await fetchRemoteLabs(params, currentLocale), currentLocale, localLabs)
+
     const remoteLabs = await loadRelations(remoteRows, currentLocale)
 
     if (shouldMirrorLocalData(provider)) {
@@ -1092,7 +1119,7 @@ function localizePascoKitComponent(
   }
 }
 
-async function fetchRemotePascoKits(subjectSlug?: string) {
+async function fetchRemotePascoKits(subjectSlug?: string, locale: Locale = 'ru') {
   if (getDataProvider() === 'postgresql') {
     const params: unknown[] = []
     let whereSql = ''
@@ -1112,11 +1139,13 @@ async function fetchRemotePascoKits(subjectSlug?: string) {
        FROM pasco_kits pk
        ${whereSql}
        ORDER BY pk.sort_order`,
-      params
+      params,
+      locale
     )
 
     return rows.map(normalizePascoKit)
   }
+
 
   const supabase = await createClient()
   let query = supabase.from('pasco_kits').select('*')
@@ -1142,7 +1171,7 @@ async function fetchRemotePascoKits(subjectSlug?: string) {
   return (data ?? []) as PascoKit[]
 }
 
-async function fetchRemotePascoKitComponents(kitId: string) {
+async function fetchRemotePascoKitComponents(kitId: string, locale: Locale = 'ru') {
   if (getDataProvider() === 'postgresql') {
     const rows = await queryPostgres<Record<string, unknown>>(
       `SELECT id, kit_id, name, name_ru, name_ky, quantity, photo_url,
@@ -1152,11 +1181,13 @@ async function fetchRemotePascoKitComponents(kitId: string) {
        FROM pasco_kit_components
        WHERE kit_id = $1
        ORDER BY sort_order`,
-      [kitId]
+      [kitId],
+      locale
     )
 
     return rows.map(normalizePascoKitComponent)
   }
+
 
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -1172,7 +1203,7 @@ async function fetchRemotePascoKitComponents(kitId: string) {
   return (data ?? []) as PascoKitComponent[]
 }
 
-async function fetchRemotePascoKitBySlug(slug: string) {
+async function fetchRemotePascoKitBySlug(slug: string, locale: Locale = 'ru') {
   if (getDataProvider() === 'postgresql') {
     const rows = await queryPostgres<Record<string, unknown>>(
       `SELECT id, slug, name, name_ru, name_ky,
@@ -1182,11 +1213,13 @@ async function fetchRemotePascoKitBySlug(slug: string) {
        FROM pasco_kits
        WHERE slug = $1
        LIMIT 1`,
-      [slug]
+      [slug],
+      locale
     )
 
     return rows.length > 0 ? normalizePascoKit(rows[0]) : null
   }
+
 
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -1202,7 +1235,7 @@ async function fetchRemotePascoKitBySlug(slug: string) {
   return (data ?? null) as PascoKit | null
 }
 
-async function fetchRemotePascoKitById(id: string) {
+async function fetchRemotePascoKitById(id: string, locale: Locale = 'ru') {
   if (getDataProvider() === 'postgresql') {
     const rows = await queryPostgres<Record<string, unknown>>(
       `SELECT id, slug, name, name_ru, name_ky,
@@ -1212,11 +1245,13 @@ async function fetchRemotePascoKitById(id: string) {
        FROM pasco_kits
        WHERE id = $1
        LIMIT 1`,
-      [id]
+      [id],
+      locale
     )
 
     return rows.length > 0 ? normalizePascoKit(rows[0]) : null
   }
+
 
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -1241,7 +1276,8 @@ async function loadPascoKitRelations(
     kit.subject_id
       ? getSubjects(locale).then((subjects) => subjects.find((s) => s.id === kit.subject_id) ?? null)
       : Promise.resolve(null),
-    fetchRemotePascoKitComponents(kit.id),
+    fetchRemotePascoKitComponents(kit.id, locale),
+
   ])
 
   const fallbackComponents = fallbackKit?.components ?? []
@@ -1278,7 +1314,8 @@ export async function getPascoKits(
   }
 
   try {
-    const remoteKits = await fetchRemotePascoKits(subjectSlug)
+    const remoteKits = await fetchRemotePascoKits(subjectSlug, currentLocale)
+
     const kits = await Promise.all(
       remoteKits.map((kit) =>
         loadPascoKitRelations(
@@ -1324,7 +1361,8 @@ export async function getPascoKitBySlug(
   }
 
   try {
-    const remoteKit = await fetchRemotePascoKitBySlug(slug)
+    const remoteKit = await fetchRemotePascoKitBySlug(slug, currentLocale)
+
     if (!remoteKit) return localKit
 
     return await loadPascoKitRelations(remoteKit, currentLocale, localKit)
@@ -1351,8 +1389,9 @@ export async function getPascoKitById(
   }
 
   try {
-    const remoteKit = await fetchRemotePascoKitById(id)
+    const remoteKit = await fetchRemotePascoKitById(id, currentLocale)
     if (!remoteKit) return localKit
+
 
     return await loadPascoKitRelations(remoteKit, currentLocale, localKit)
   } catch (error) {

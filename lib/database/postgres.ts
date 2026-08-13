@@ -1,6 +1,9 @@
 import { Pool } from 'pg'
+import type { Locale } from '@/types'
 
-let pool: Pool | null = null
+// Отдельные пулы для каждой языковой базы данных.
+// Русская версия -> pasco_lab_ru, Кыргызская версия -> pasco_lab_ky.
+const pools: Record<Locale, Pool | null> = { ru: null, ky: null }
 
 function normalize(value: string | undefined) {
   return value?.trim() ?? ''
@@ -33,14 +36,33 @@ export function hasPostgresEnv() {
   return Boolean(normalize(process.env.DATABASE_URL))
 }
 
-export function getPostgresPool() {
+/**
+ * Возвращает имя базы данных для указанной локали.
+ * Русская версия -> pasco_lab_ru, Кыргызская версия -> pasco_lab_ky.
+ */
+export function getDatabaseName(locale: Locale): string {
+  return locale === 'ky' ? 'pasco_lab_ky' : 'pasco_lab_ru'
+}
+
+/**
+ * Строит connection string для указанной локали, заменяя имя базы данных
+ * в DATABASE_URL на соответствующее (pasco_lab_ru / pasco_lab_ky).
+ */
+function getConnectionString(locale: Locale): string {
+  const base = normalize(process.env.DATABASE_URL)
+  const dbName = getDatabaseName(locale)
+  // Заменяем последний сегмент пути (имя базы) на нужное.
+  return base.replace(/\/[^/]*$/, `/${dbName}`)
+}
+
+export function getPostgresPool(locale: Locale = 'ru') {
   if (!hasPostgresEnv()) {
     throw new Error('DATABASE_URL is not configured')
   }
 
-  if (!pool) {
-    pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
+  if (!pools[locale]) {
+    pools[locale] = new Pool({
+      connectionString: getConnectionString(locale),
       ssl: getPostgresSslConfig(),
       max: getPoolMax(),
       idleTimeoutMillis: 30_000,
@@ -48,11 +70,15 @@ export function getPostgresPool() {
     })
   }
 
-  return pool
+  return pools[locale]
 }
 
-export async function queryPostgres<T extends Record<string, unknown> = Record<string, unknown>>(text: string, params: unknown[] = []) {
-  const client = await getPostgresPool().connect()
+export async function queryPostgres<T extends Record<string, unknown> = Record<string, unknown>>(
+  text: string,
+  params: unknown[] = [],
+  locale: Locale = 'ru'
+) {
+  const client = await getPostgresPool(locale).connect()
 
   try {
     const result = await client.query<T>(text, params)

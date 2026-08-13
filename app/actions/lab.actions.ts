@@ -324,13 +324,14 @@ async function createPostgresLab(payload: LabMutationPayload, locale: Locale, sl
   const placeholders = columns.map((_, index) => `$${index + 1}`).join(', ')
   const values = Object.values(row)
 
-  const client = await getPostgresPool().connect()
+  const client = await getPostgresPool(locale).connect()
 
   try {
     const { rows } = await client.query<Record<string, unknown>>(
       `INSERT INTO labs (${columns.join(', ')}) VALUES (${placeholders}) RETURNING id, slug, title, title_ru, title_ky, content, content_ru, content_ky, thumbnail_url, photo_urls, is_published, subject_id, grade_id, equipment_ids, difficulty, duration_minutes, created_at, updated_at`,
       values
     )
+
 
     const createdRow = rows[0]
 
@@ -363,11 +364,12 @@ async function createPostgresLab(payload: LabMutationPayload, locale: Locale, sl
   }
 }
 
-async function replacePostgresResources(labId: string, resources: Resource[]) {
+async function replacePostgresResources(labId: string, resources: Resource[], locale: Locale) {
   if (resources.length === 0) {
-    await getPostgresPool().query('DELETE FROM resources WHERE lab_id = $1', [labId])
+    await getPostgresPool(locale).query('DELETE FROM resources WHERE lab_id = $1', [labId])
     return
   }
+
 
   const values: unknown[] = []
   const params: string[] = []
@@ -393,10 +395,11 @@ async function replacePostgresResources(labId: string, resources: Resource[]) {
     )
   }
 
-  const client = await getPostgresPool().connect()
+  const client = await getPostgresPool(locale).connect()
   try {
     await client.query('BEGIN')
     await client.query('DELETE FROM resources WHERE lab_id = $1', [labId])
+
     await client.query(
       `INSERT INTO resources (id, lab_id, resource_type, title, title_ru, title_ky, description, description_ru, description_ky, url, file_size, sort_order, created_at, updated_at)
        VALUES ${params.join(', ')}`,
@@ -411,11 +414,12 @@ async function replacePostgresResources(labId: string, resources: Resource[]) {
   }
 }
 
-async function replacePostgresSteps(labId: string, steps: LabStep[]) {
+async function replacePostgresSteps(labId: string, steps: LabStep[], locale: Locale) {
   if (steps.length === 0) {
-    await getPostgresPool().query('DELETE FROM lab_steps WHERE lab_id = $1', [labId])
+    await getPostgresPool(locale).query('DELETE FROM lab_steps WHERE lab_id = $1', [labId])
     return
   }
+
 
   const values: unknown[] = []
   const params: string[] = []
@@ -439,10 +443,11 @@ async function replacePostgresSteps(labId: string, steps: LabStep[]) {
     )
   }
 
-  const client = await getPostgresPool().connect()
+  const client = await getPostgresPool(locale).connect()
   try {
     await client.query('BEGIN')
     await client.query('DELETE FROM lab_steps WHERE lab_id = $1', [labId])
+
     await client.query(
       `INSERT INTO lab_steps (id, lab_id, step_order, block_type, content, content_ru, content_ky, caption, caption_ru, caption_ky, created_at, updated_at)
        VALUES ${params.join(', ')}`,
@@ -464,13 +469,14 @@ async function updatePostgresLab(labId: string, payload: LabMutationPayload, loc
   const assignments = columns.map(([column], index) => `${column} = $${index + 2}`).join(', ')
   const values = columns.map(([, value]) => value)
 
-  const client = await getPostgresPool().connect()
+  const client = await getPostgresPool(locale).connect()
 
   try {
     const { rows } = await client.query<Record<string, unknown>>(
       `UPDATE labs SET ${assignments} WHERE id = $1 RETURNING id, slug, title, title_ru, title_ky, content, content_ru, content_ky, thumbnail_url, photo_urls, is_published, subject_id, grade_id, equipment_ids, difficulty, duration_minutes, created_at, updated_at`,
       [labId, ...values]
     )
+
 
     const updatedRow = rows[0]
 
@@ -503,8 +509,9 @@ async function updatePostgresLab(labId: string, payload: LabMutationPayload, loc
   }
 }
 
-async function togglePostgresPublish(labId: string, published: boolean) {
-  const client = await getPostgresPool().connect()
+async function togglePostgresPublish(labId: string, published: boolean, locale: Locale) {
+  const client = await getPostgresPool(locale).connect()
+
 
   try {
     const { rows } = await client.query<Record<string, unknown>>(
@@ -541,8 +548,9 @@ async function togglePostgresPublish(labId: string, published: boolean) {
   }
 }
 
-async function deletePostgresLab(labId: string) {
-  const client = await getPostgresPool().connect()
+async function deletePostgresLab(labId: string, locale: Locale) {
+  const client = await getPostgresPool(locale).connect()
+
 
   try {
     await client.query('DELETE FROM lab_equipment_items WHERE lab_id = $1', [labId])
@@ -628,11 +636,12 @@ export async function createLabAction(formData: FormData) {
       const remoteLab = await createPostgresLab(payload, locale, payload.slug)
       const resourceRows = buildResourceRows(payload.resources, remoteLab.id)
       const stepRows = buildStepRows(payload.steps, remoteLab.id, locale)
-      await replacePostgresResources(remoteLab.id, resourceRows)
-      await replacePostgresSteps(remoteLab.id, stepRows)
+      await replacePostgresResources(remoteLab.id, resourceRows, locale)
+      await replacePostgresSteps(remoteLab.id, stepRows, locale)
       await syncLocalLabMirror({ lab: toStoredLab(remoteLab as Lab), resources: resourceRows, steps: stepRows }, locale)
       revalidateLabPages()
       return
+
     } catch (error) {
       if (!shouldMirrorLocalData(provider)) {
         throw error
@@ -693,8 +702,9 @@ export async function deleteLabAction(labId: string, locale?: Locale) {
 
   if (canUsePostgresWrites(provider)) {
     try {
-      await deletePostgresLab(labId)
+      await deletePostgresLab(labId, currentLocale)
       await deleteLocalLab(labId, currentLocale)
+
       revalidateLabPages(labId)
       return
     } catch (error) {
@@ -749,8 +759,9 @@ export async function togglePublishAction(labId: string, published: boolean, loc
 
   if (canUsePostgresWrites(provider)) {
     try {
-      await togglePostgresPublish(labId, published)
+      await togglePostgresPublish(labId, published, currentLocale)
       await toggleLocalLab(labId, published, currentLocale)
+
       revalidateLabPages(labId)
       return
     } catch (error) {
@@ -837,11 +848,12 @@ export async function updateLabAction(labId: string, formData: FormData) {
       const remoteLab = await updatePostgresLab(labId, payload, locale)
       const resourceRows = buildResourceRows(payload.resources, remoteLab.id)
       const stepRows = buildStepRows(payload.steps, remoteLab.id, locale)
-      await replacePostgresResources(remoteLab.id, resourceRows)
-      await replacePostgresSteps(remoteLab.id, stepRows)
+      await replacePostgresResources(remoteLab.id, resourceRows, locale)
+      await replacePostgresSteps(remoteLab.id, stepRows, locale)
       await syncLocalLabMirror({ lab: toStoredLab(remoteLab as Lab), resources: resourceRows, steps: stepRows }, locale)
       revalidateLabPages(labId)
       return
+
     } catch (error) {
       if (!shouldMirrorLocalData(provider)) {
         throw error

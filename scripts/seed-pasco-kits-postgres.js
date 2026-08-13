@@ -29,6 +29,9 @@ const DATABASE_URL =
   process.env.DATABASE_URL ||
   'postgresql://pasco_user:pasco_password@localhost:5432/pasco_lab_db'
 
+// Имена баз данных для каждой локали (см. lib/database/postgres.ts)
+const DB_NAMES = { ru: 'pasco_lab_ru', ky: 'pasco_lab_ky' }
+
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'))
 }
@@ -37,24 +40,22 @@ function pick(preferred, fallback) {
   return preferred ?? fallback ?? null
 }
 
-async function main() {
-  console.log('📦 Загрузка PASCO-комплектов в PostgreSQL...')
-  console.log(`   Подключение: ${DATABASE_URL.replace(/:[^:@]+@/, ':***@')}`)
+// Строит connection string для указанной локали, заменяя имя базы данных.
+function getConnectionString(locale) {
+  const dbName = DB_NAMES[locale]
+  return DATABASE_URL.replace(/\/[^/]*$/, `/${dbName}`)
+}
 
-  const ru = readJson(RU_FILE)
-  const ky = readJson(KY_FILE)
+async function seedDatabase(locale, ru, ky) {
+  const connectionString = getConnectionString(locale)
+  console.log(`\n🌐 База данных: ${DB_NAMES[locale]}`)
 
   const ruKits = ru.pasco_kits || []
   const kyKits = ky.pasco_kits || []
   const ruComponents = ru.pasco_kit_components || []
   const kyComponents = ky.pasco_kit_components || []
 
-  console.log(`   Русских комплектов: ${ruKits.length}`)
-  console.log(`   Кыргызских комплектов: ${kyKits.length}`)
-  console.log(`   Русских компонентов: ${ruComponents.length}`)
-  console.log(`   Кыргызских компонентов: ${kyComponents.length}`)
-
-  const client = new Client({ connectionString: DATABASE_URL })
+  const client = new Client({ connectionString })
   await client.connect()
 
   try {
@@ -64,10 +65,10 @@ async function main() {
     )
     if (!tableCheck.rows[0].kits || !tableCheck.rows[0].components) {
       console.error(
-        '❌ Таблицы pasco_kits / pasco_kit_components не найдены.\n' +
+        `❌ Таблицы pasco_kits / pasco_kit_components не найдены в ${DB_NAMES[locale]}.\n` +
           '   Сначала примените миграцию: supabase/migrations/2026-08-11_add_pasco_kits.sql'
       )
-      process.exit(1)
+      return
     }
 
     // 2. Очищаем существующие данные (для повторного запуска)
@@ -189,8 +190,6 @@ async function main() {
       'SELECT COUNT(*) AS count FROM pasco_kit_components'
     )
 
-    console.log('')
-    console.log('✅ Готово!')
     console.log(`   Комплектов в БД: ${kitResult.rows[0].count}`)
     console.log(`   Компонентов в БД: ${compResult.rows[0].count}`)
     console.log(`   Вставлено компонентов: ${componentCount}`)
@@ -198,6 +197,26 @@ async function main() {
     await client.end()
   }
 }
+
+async function main() {
+  console.log('📦 Загрузка PASCO-комплектов в PostgreSQL...')
+  console.log(`   Подключение: ${DATABASE_URL.replace(/:[^:@]+@/, ':***@')}`)
+
+  const ru = readJson(RU_FILE)
+  const ky = readJson(KY_FILE)
+
+  console.log(`   Русских комплектов: ${(ru.pasco_kits || []).length}`)
+  console.log(`   Кыргызских комплектов: ${(ky.pasco_kits || []).length}`)
+  console.log(`   Русских компонентов: ${(ru.pasco_kit_components || []).length}`)
+  console.log(`   Кыргызских компонентов: ${(ky.pasco_kit_components || []).length}`)
+
+  // Заполняем обе базы данных (pasco_lab_ru и pasco_lab_ky)
+  await seedDatabase('ru', ru, ky)
+  await seedDatabase('ky', ru, ky)
+
+  console.log('\n✅ Готово! Обе базы данных (RU и KY) заполнены.')
+}
+
 
 main().catch((err) => {
   console.error('❌ Ошибка:', err.message)
