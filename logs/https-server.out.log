@@ -1,6 +1,0 @@
-
-> pasco-lab-portal@0.1.0 start:https:lan
-> node scripts/https-server.mjs
-
-PASCO Lab HTTPS: https://192.168.88.37:3443
-PASCO Lab redirect: http://192.168.88.37:3000
