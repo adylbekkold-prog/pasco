@@ -8,6 +8,10 @@
 #
 # Запуск (из корня проекта):
 #   bash scripts/purge-secrets.sh
+#
+# Скрипт НЕ содержит реальных паролей. Он заменяет значения,
+# которые ты передашь через переменные окружения:
+#   OLD_DB_PASSWORD, OLD_ADMIN_PASSWORD, OLD_ADMIN_SESSION_SECRET
 # ============================================================
 set -euo pipefail
 
@@ -21,24 +25,42 @@ if [ ! -d .git ]; then
   exit 1
 fi
 
-# 2. Создаём резервную ветку на случай ошибки
+# 2. Проверяем, что заданы старые значения для замены
+if [ -z "${OLD_DB_PASSWORD:-}" ] && [ -z "${OLD_ADMIN_PASSWORD:-}" ] && [ -z "${OLD_ADMIN_SESSION_SECRET:-}" ]; then
+  echo "❌ Не заданы переменные OLD_DB_PASSWORD / OLD_ADMIN_PASSWORD / OLD_ADMIN_SESSION_SECRET."
+  echo "   Задай их через export перед запуском, например:"
+  echo "   export OLD_DB_PASSWORD='старый_пароль_бд'"
+  echo "   export OLD_ADMIN_PASSWORD='старый_пароль_админки'"
+  echo "   export OLD_ADMIN_SESSION_SECRET='старый_секрет'"
+  echo "   bash scripts/purge-secrets.sh"
+  exit 1
+fi
+
+# 3. Создаём резервную ветку на случай ошибки
 echo "📦 Создаём резервную ветку backup-before-purge..."
 git branch backup-before-purge 2>/dev/null || echo "   (ветка уже существует)"
 
-# 3. Удаляем секреты из ВСЕЙ истории
-#    Заменяем реальные значения на плейсхолдеры во всех коммитах.
-echo "🧹 Удаляю секреты из истории..."
-FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --tree-filter '
-  if [ -f scripts/setup-hetzner-vps.sh ]; then
-    sed -i \
-      -e "s/CHANGE_ME_DB_PASSWORD/CHANGE_ME_DB_PASSWORD/g" \
-      -e "s/CHANGE_ME_ADMIN_PASSWORD/CHANGE_ME_ADMIN_PASSWORD/g" \
-      -e "s/CHANGE_ME_ADMIN_SESSION_SECRET/CHANGE_ME_ADMIN_SESSION_SECRET/g" \
-      scripts/setup-hetzner-vps.sh
-  fi
-' -- --all
+# 4. Строим команду sed для замены заданных значений
+SED_CMD=""
+if [ -n "${OLD_DB_PASSWORD:-}" ]; then
+  SED_CMD="${SED_CMD} -e 's/${OLD_DB_PASSWORD}/CHANGE_ME_DB_PASSWORD/g'"
+fi
+if [ -n "${OLD_ADMIN_PASSWORD:-}" ]; then
+  SED_CMD="${SED_CMD} -e 's/${OLD_ADMIN_PASSWORD}/CHANGE_ME_ADMIN_PASSWORD/g'"
+fi
+if [ -n "${OLD_ADMIN_SESSION_SECRET:-}" ]; then
+  SED_CMD="${SED_CMD} -e 's/${OLD_ADMIN_SESSION_SECRET}/CHANGE_ME_ADMIN_SESSION_SECRET/g'"
+fi
 
-# 4. Очищаем ссылки на старые коммиты
+# 5. Удаляем секреты из ВСЕЙ истории
+echo "🧹 Удаляю секреты из истории..."
+FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --tree-filter "
+  if [ -f scripts/setup-hetzner-vps.sh ]; then
+    sed -i ${SED_CMD} scripts/setup-hetzner-vps.sh
+  fi
+" -- --all
+
+# 6. Очищаем ссылки на старые коммиты
 echo "🧹 Очищаю ссылки на старые коммиты..."
 git for-each-ref --format="%(refname)" refs/original/ | xargs -n 1 git update-ref -d 2>/dev/null || true
 git reflog expire --expire=now --all
