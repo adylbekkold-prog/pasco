@@ -4,8 +4,8 @@ import { notFound } from 'next/navigation'
 import { getCurrentLocale } from '@/lib/locale-server'
 import { getEquipment, getGrades, getLabById, getLabBySlug, getSubjects } from '@/lib/queries'
 import LabEditForm from '@/components/LabEditForm'
-import { assertServerLocalAdminAccess } from '@/lib/admin-access'
 import { adminPath } from '@/lib/admin-routes'
+
 import { getAdminCopy } from '@/lib/i18n/admin'
 
 export const dynamic = 'force-dynamic'
@@ -28,8 +28,8 @@ async function resolveLabForEdit(ref: string, locale: 'ru' | 'ky') {
 }
 
 export default async function EditLabPage({ params }: EditLabPageProps) {
-  await assertServerLocalAdminAccess()
   const locale = await getCurrentLocale()
+
   const copy = getAdminCopy(locale, 'labEdit')
   const { id } = await params
   const decodedRef = decodeURIComponent(id)

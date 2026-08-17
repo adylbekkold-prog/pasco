@@ -5,9 +5,9 @@ import { notFound } from 'next/navigation'
 import { getCurrentLocale } from '@/lib/locale-server'
 import { getLocalSubjects } from '@/lib/local-db'
 import { getPascoKitById } from '@/lib/queries'
-import { assertServerLocalAdminAccess } from '@/lib/admin-access'
 
 import { adminPath } from '@/lib/admin-routes'
+
 import { Button } from '@/components/ui/button'
 import { PascoKitForm } from '@/components/PascoKitForm'
 import { PascoKitComponentsList } from '@/components/PascoKitComponentsList'
@@ -16,8 +16,8 @@ import { getAdminCopy } from '@/lib/i18n/admin'
 export const dynamic = 'force-dynamic'
 interface KitEditPageProps { params: Promise<{ id: string }> }
 async function KitEditPage(props: KitEditPageProps) {
-  await assertServerLocalAdminAccess()
   const locale = await getCurrentLocale()
+
   const params = await props.params
   const copy = getAdminCopy(locale, 'pascoKitEdit')
   const [kit, subjects] = await Promise.all([getPascoKitById(params.id, locale), getLocalSubjects(locale)])

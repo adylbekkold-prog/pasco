@@ -3,16 +3,16 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { getCurrentLocale } from '@/lib/locale-server'
 import { getLocalSubjects } from '@/lib/local-db'
-import { assertServerLocalAdminAccess } from '@/lib/admin-access'
 import { adminPath } from '@/lib/admin-routes'
+
 import { Button } from '@/components/ui/button'
 import { PascoKitForm } from '@/components/PascoKitForm'
 import { getAdminCopy } from '@/lib/i18n/admin'
 
 export const dynamic = 'force-dynamic'
 async function NewKitPage() {
-  await assertServerLocalAdminAccess()
   const locale = await getCurrentLocale()
+
   const copy = getAdminCopy(locale, 'pascoKitNew')
   const subjects = await getLocalSubjects(locale)
   return (

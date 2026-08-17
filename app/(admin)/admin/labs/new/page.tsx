@@ -2,12 +2,11 @@
 import { getCurrentLocale } from '@/lib/locale-server'
 import { getEquipment, getGrades, getSubjects } from '@/lib/queries'
 import LabForm from '@/components/LabForm'
-import { assertServerLocalAdminAccess } from '@/lib/admin-access'
 import { getAdminCopy } from '@/lib/i18n/admin'
 
 export default async function NewLabPage() {
-  await assertServerLocalAdminAccess()
   const locale = await getCurrentLocale()
+
   const copy = getAdminCopy(locale, 'labNew')
   const [subjects, grades, equipment] = await Promise.all([getSubjects(locale), getGrades(locale), getEquipment(locale)])
 

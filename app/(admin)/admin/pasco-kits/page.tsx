@@ -3,16 +3,16 @@ import { Boxes, Plus } from 'lucide-react'
 import { getCurrentLocale } from '@/lib/locale-server'
 import { getLocalSubjects } from '@/lib/local-db'
 import { getPascoKits } from '@/lib/queries'
-import { assertServerLocalAdminAccess } from '@/lib/admin-access'
 
 import { adminPath } from '@/lib/admin-routes'
+
 import { getAdminCopy } from '@/lib/i18n/admin'
 
 export const dynamic = 'force-dynamic'
 
 export default async function PascoKitsPage() {
-  await assertServerLocalAdminAccess()
   const locale = await getCurrentLocale()
+
   const copy = getAdminCopy(locale, 'pascoKitsList')
   const [kits, subjects] = await Promise.all([getPascoKits(undefined, locale), getLocalSubjects(locale)])
 

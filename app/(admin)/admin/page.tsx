@@ -4,16 +4,16 @@ import { Activity, ClipboardList, FlaskConical, Layers3, Plus, TrendingUp } from
 import { getCurrentLocale } from '@/lib/locale-server'
 import { getLabs } from '@/lib/queries'
 import type { Lab } from '@/types'
-import { assertServerLocalAdminAccess } from '@/lib/admin-access'
 import { adminPath } from '@/lib/admin-routes'
+
 import { getAdminCopy } from '@/lib/i18n/admin'
 import { MetricCard } from '@/components/ui/metric-card'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboard() {
-  await assertServerLocalAdminAccess()
   const locale = await getCurrentLocale()
+
   const copy = getAdminCopy(locale, 'dashboard')
 
   let totalLabs = 0, publishedLabs = 0, draftLabs = 0

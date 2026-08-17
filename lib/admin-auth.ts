@@ -1,6 +1,7 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { ADMIN_LOGIN_PATH } from '@/lib/admin-routes'
+
 
 const ADMIN_AUTH_COOKIE = 'pasco_admin_auth'
 const ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 8
@@ -68,6 +69,21 @@ export async function hasAdminSession() {
   return verifyAdminSessionValue(cookieStore.get(ADMIN_AUTH_COOKIE)?.value)
 }
 
+/**
+ * Determines whether the current request arrived over a secure (HTTPS)
+ * connection. When the app is served behind a reverse proxy (nginx), the
+ * protocol is exposed via the X-Forwarded-Proto header. This matters because
+ * a `Secure` cookie is only sent by browsers over HTTPS — if the site is
+ * served over plain HTTP, marking the session cookie `Secure` would silently
+ * break admin login (the cookie would never be sent back).
+ */
+async function isSecureConnection() {
+  const headersList = await headers()
+  const proto = headersList.get('x-forwarded-proto') ?? headersList.get('x-forwarded-protocol')
+  if (proto) return proto.split(',')[0].trim() === 'https'
+  return false
+}
+
 export async function setAdminSessionCookie() {
   const cookieStore = await cookies()
   cookieStore.set(ADMIN_AUTH_COOKIE, createAdminSessionValue(), {
@@ -75,7 +91,7 @@ export async function setAdminSessionCookie() {
     maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
     path: '/',
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: await isSecureConnection(),
   })
 }
 
@@ -86,9 +102,10 @@ export async function clearAdminSessionCookie() {
     maxAge: 0,
     path: '/',
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: await isSecureConnection(),
   })
 }
+
 
 export function getAdminLoginPath(nextPath?: string) {
   if (!nextPath) return ADMIN_LOGIN_PATH

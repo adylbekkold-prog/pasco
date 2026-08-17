@@ -178,6 +178,9 @@ export async function serveUploadedLabFile(request: Request, segments: string[])
       headers,
     })
   } catch {
-    return new Response('Not found', { status: 404 })
+    return new Response('Not found', {
+      status: 404,
+      headers: { 'cache-control': 'no-store' },
+    })
   }
 }

@@ -6,8 +6,8 @@ import { getLabs } from '@/lib/queries'
 import LabDeleteButton from '@/components/LabDeleteButton'
 import LabPublishToggle from '@/components/LabPublishToggle'
 import type { Lab } from '@/types'
-import { assertServerLocalAdminAccess } from '@/lib/admin-access'
 import { adminPath } from '@/lib/admin-routes'
+
 import { getAdminCopy } from '@/lib/i18n/admin'
 
 export const dynamic = 'force-dynamic'
@@ -17,8 +17,8 @@ interface AdminLabsPageProps {
 }
 
 export default async function AdminLabsPage({ searchParams }: AdminLabsPageProps) {
-  await assertServerLocalAdminAccess()
   const locale = await getCurrentLocale()
+
   const copy = getAdminCopy(locale, 'labsList')
   const params = await searchParams
   const query = String(params.q ?? '').trim().toLowerCase()
