@@ -26,7 +26,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PascoKitsCatalogPage() {
   const locale = await getCurrentLocale()
   const copy = getPublicCopy(locale, 'pascoKitsCatalog')
-  const fallbackOptions = locale === 'ky' ? { fallbackLocale: 'ru' as const } : undefined
   const [kits, subjects] = await Promise.all([
     getPascoKits(undefined, locale),
     getLocalSubjects(locale),

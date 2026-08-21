@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { readdir, stat } from 'fs/promises'
 import path from 'path'
+import { assertServerLocalAdminAccess } from '@/lib/admin-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -90,6 +91,15 @@ async function buildPhotoTree(
 }
 
 export async function GET(request: Request) {
+  try {
+    await assertServerLocalAdminAccess()
+  } catch {
+    return NextResponse.json<BrowseResponse>(
+      { success: false, error: 'Требуется пароль администратора.' },
+      { status: 401 }
+    )
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const subPath = searchParams.get('path')

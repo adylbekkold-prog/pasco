@@ -10,6 +10,7 @@ const allowedDevOrigins = Array.from(
 );
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   async redirects() {
     return [
       {
@@ -46,6 +47,41 @@ const nextConfig: NextConfig = {
     ];
   },
   async headers() {
+    const globalSecurityHeaders = [
+      {
+        key: 'Content-Security-Policy',
+        value: "base-uri 'self'; form-action 'self'; frame-ancestors 'self'",
+      },
+      {
+        key: 'Permissions-Policy',
+        value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=()',
+      },
+      {
+        key: 'Referrer-Policy',
+        value: 'strict-origin-when-cross-origin',
+      },
+      {
+        key: 'X-Content-Type-Options',
+        value: 'nosniff',
+      },
+      {
+        key: 'X-DNS-Prefetch-Control',
+        value: 'off',
+      },
+      {
+        key: 'X-Frame-Options',
+        value: 'SAMEORIGIN',
+      },
+      ...(process.env.ENABLE_HSTS === 'true'
+        ? [
+            {
+              key: 'Strict-Transport-Security',
+              value: 'max-age=31536000; includeSubDomains',
+            },
+          ]
+        : []),
+    ];
+
     const sparkVueContentSecurityPolicy = [
       "default-src 'self' blob: data:",
       "base-uri 'self'",
@@ -109,6 +145,10 @@ const nextConfig: NextConfig = {
     ];
 
     return [
+      {
+        source: '/:path*',
+        headers: globalSecurityHeaders,
+      },
       {
         source: '/labs/:path*',
         headers: sparkVueSecurityHeaders,

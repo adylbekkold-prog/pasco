@@ -17,7 +17,6 @@ const { execSync } = require('child_process')
 
 const DATA_DIR = path.join(process.cwd(), 'data')
 const RU_DB_PATH = path.join(DATA_DIR, 'local-db.ru.json')
-const ORIGINAL_PATH = path.join(DATA_DIR, 'local-db.ru.original.json')
 
 function main() {
   // Получаем оригинальную русскую базу из git

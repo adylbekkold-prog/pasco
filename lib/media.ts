@@ -1,5 +1,5 @@
 const DIRECT_VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogg', '.mov', '.m4v']
-const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp', '.svg', '.avif']
+const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp', '.avif']
 const SAFE_RESOURCE_PROTOCOLS = new Set(['http:', 'https:'])
 
 function isSameOrSubdomain(hostname: string, domain: string) {

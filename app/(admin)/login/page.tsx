@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { FlaskConical, LockKeyhole, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,8 +10,14 @@ import { getAdminCopy } from '@/lib/i18n/admin'
 import { getCurrentLocale } from '@/lib/locale-server'
 import { adminPath, ADMIN_BASE_PATH } from '@/lib/admin-routes'
 import {
+  clearAdminLoginFailures,
+  getAdminLoginRateLimitKey,
+  getAdminLoginRateLimitState,
   hasAdminSession,
+  isAdminAuthConfigured,
   isAdminPasswordConfigured,
+  isAdminSessionSecretConfigured,
+  recordFailedAdminLogin,
   setAdminSessionCookie,
   verifyAdminPassword,
 } from '@/lib/admin-auth'
@@ -41,6 +48,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams
   const nextPath = normalizeNextPath(params.next)
   const passwordConfigured = isAdminPasswordConfigured()
+  const sessionSecretConfigured = isAdminSessionSecretConfigured()
+  const adminAuthConfigured = isAdminAuthConfigured()
 
   if (await hasAdminSession()) redirect(nextPath)
 
@@ -49,11 +58,19 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
     const password = String(formData.get('password') ?? '')
     const next = normalizeNextPath(String(formData.get('next') ?? ''))
+    const rateLimitKey = getAdminLoginRateLimitKey(await headers())
+    const rateLimit = getAdminLoginRateLimitState(rateLimitKey)
 
-    if (!verifyAdminPassword(password)) {
+    if (rateLimit.limited) {
+      redirect(`${adminPath('/login')}?error=rate_limited&next=${encodeURIComponent(next)}`)
+    }
+
+    if (!isAdminAuthConfigured() || !verifyAdminPassword(password)) {
+      recordFailedAdminLogin(rateLimitKey)
       redirect(`${adminPath('/login')}?error=1&next=${encodeURIComponent(next)}`)
     }
 
+    clearAdminLoginFailures(rateLimitKey)
     await setAdminSessionCookie()
     redirect(next)
   }
@@ -85,9 +102,23 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
         )}
 
+        {passwordConfigured && process.env.NODE_ENV === 'production' && !sessionSecretConfigured && (
+          <div className="mb-4 rounded-[14px] border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {locale === 'ky'
+              ? 'ADMIN_SESSION_SECRET production үчүн коюлган эмес.'
+              : 'ADMIN_SESSION_SECRET не задан для production.'}
+          </div>
+        )}
+
         {params.error && (
           <div className="mb-4 rounded-[14px] border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-            {locale === 'ky' ? 'Сырсөз туура эмес.' : 'Неверный пароль.'}
+            {params.error === 'rate_limited'
+              ? locale === 'ky'
+                ? 'Өтө көп аракет. Бир аздан кийин кайра аракет кылыңыз.'
+                : 'Слишком много попыток. Попробуйте позже.'
+              : locale === 'ky'
+                ? 'Сырсөз туура эмес.'
+                : 'Неверный пароль.'}
           </div>
         )}
 
@@ -102,9 +133,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               autoComplete="current-password"
               placeholder={locale === 'ky' ? 'Админ сырсөзү' : 'Пароль админки'}
               required
+              disabled={!adminAuthConfigured}
             />
           </div>
-          <Button type="submit" size="lg" className="w-full rounded-[14px]" disabled={!passwordConfigured}>
+          <Button type="submit" size="lg" className="w-full rounded-[14px]" disabled={!adminAuthConfigured}>
             <LockKeyhole size={16} />
             {copy.login}
           </Button>

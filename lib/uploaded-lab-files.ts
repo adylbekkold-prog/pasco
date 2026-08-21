@@ -18,7 +18,6 @@ const CONTENT_TYPES: Record<string, string> = {
   '.pdf': 'application/pdf',
   '.png': 'image/png',
   '.spklab': 'application/octet-stream',
-  '.svg': 'image/svg+xml',
   '.webm': 'video/webm',
   '.webp': 'image/webp',
 }

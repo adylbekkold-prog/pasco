@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { ExternalLink } from 'lucide-react'
-import { getEmbeddableVideoUrl, isDirectVideoUrl } from '@/lib/media'
+import { getEmbeddableVideoUrl, isDirectVideoUrl, isImageUrl, isSafeResourceUrl } from '@/lib/media'
 import type { LabStep, Locale } from '@/types'
 
 export default function StepViewer({
@@ -38,7 +38,7 @@ export default function StepViewer({
 
             {step.block_type === 'text' && <p className="lab-step-text">{step.content}</p>}
 
-            {step.block_type === 'image' && step.content && (
+            {step.block_type === 'image' && step.content && isSafeImageUrl(step.content) && (
               <MediaFrame caption={step.caption}>
                 <div className="lab-step-media">
                   <img
@@ -57,7 +57,7 @@ export default function StepViewer({
               </MediaFrame>
             )}
 
-            {step.block_type === 'link' && step.content && (
+            {step.block_type === 'link' && step.content && isSafeResourceUrl(step.content) && (
               <a
                 href={step.content}
                 target="_blank"
@@ -69,7 +69,7 @@ export default function StepViewer({
               </a>
             )}
 
-            {step.block_type === 'diagram' && step.content && (
+            {step.block_type === 'diagram' && step.content && isSafeImageUrl(step.content) && (
               <MediaFrame caption={step.caption}>
                 <div className="lab-step-media">
                   <img
@@ -97,6 +97,8 @@ function StepVideo({
   label: string
   locale: Locale
 }) {
+  if (!isSafeResourceUrl(url)) return null
+
   const embedUrl = getEmbeddableVideoUrl(url)
 
   if (embedUrl) {
@@ -131,6 +133,10 @@ function StepVideo({
       {locale === 'ky' ? 'Видеону ачуу' : 'Открыть видео'}
     </a>
   )
+}
+
+function isSafeImageUrl(url: string) {
+  return isSafeResourceUrl(url) && isImageUrl(url)
 }
 
 function MediaFrame({

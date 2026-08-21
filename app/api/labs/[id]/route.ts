@@ -23,6 +23,10 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     const provider = getDataProvider()
     const lab = await getLabById(id, locale)
 
+    if (!lab.is_published) {
+      return jsonResponse({ error: 'Лаборатория не найдена' }, { status: 404 })
+    }
+
     return jsonResponse({ provider, item: lab })
   } catch (error) {
     return jsonResponse(

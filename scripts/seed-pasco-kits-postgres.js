@@ -14,7 +14,7 @@
  *   node scripts/seed-pasco-kits-postgres.js
  *
  * Переменные окружения (или .env.postgres):
- *   DATABASE_URL=postgresql://pasco_user:pasco_password@localhost:5432/pasco_lab_db
+ *   DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE
  */
 
 const fs = require('fs')
@@ -25,19 +25,13 @@ const DATA_DIR = path.join(__dirname, '..', 'data')
 const RU_FILE = path.join(DATA_DIR, 'local-db.ru.json')
 const KY_FILE = path.join(DATA_DIR, 'local-db.ky.json')
 
-const DATABASE_URL =
-  process.env.DATABASE_URL ||
-  'postgresql://pasco_user:pasco_password@localhost:5432/pasco_lab_db'
+const DATABASE_URL = process.env.DATABASE_URL
 
 // Имена баз данных для каждой локали (см. lib/database/postgres.ts)
 const DB_NAMES = { ru: 'pasco_lab_ru', ky: 'pasco_lab_ky' }
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'))
-}
-
-function pick(preferred, fallback) {
-  return preferred ?? fallback ?? null
 }
 
 // Строит connection string для указанной локали, заменяя имя базы данных.
@@ -199,6 +193,10 @@ async function seedDatabase(locale, ru, ky) {
 }
 
 async function main() {
+  if (!DATABASE_URL) {
+    throw new Error('DATABASE_URL is required.')
+  }
+
   console.log('📦 Загрузка PASCO-комплектов в PostgreSQL...')
   console.log(`   Подключение: ${DATABASE_URL.replace(/:[^:@]+@/, ':***@')}`)
 

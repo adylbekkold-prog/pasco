@@ -37,4 +37,13 @@ describe('uploaded lab file streaming', () => {
 
     expect(response.status).toBe(400)
   })
+
+  it('does not serve uploaded SVG files', async () => {
+    const response = await serveUploadedLabFile(
+      new Request('http://localhost:3000/uploads/labs/__test__/attack.svg'),
+      ['__test__', 'attack.svg']
+    )
+
+    expect(response.status).toBe(400)
+  })
 })

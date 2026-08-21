@@ -1,7 +1,6 @@
 const fs = require('fs')
 
 const ru = JSON.parse(fs.readFileSync('./data/local-db.ru.json', 'utf8'))
-const ky = JSON.parse(fs.readFileSync('./data/local-db.ky.json', 'utf8'))
 
 function removeAlt(v, fields, locale) {
   const n = { ...v }

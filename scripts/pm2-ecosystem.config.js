@@ -3,8 +3,8 @@ module.exports = {
     {
       name: 'pasco-lab-portal',
       script: 'npm',
-      args: 'start',
-      cwd: '/var/www/pasco-lab-portal',
+      args: 'run start -- --hostname 127.0.0.1 --port 3000',
+      cwd: '/var/www/project1',
       env: {
         NODE_ENV: 'production',
         PORT: 3000,

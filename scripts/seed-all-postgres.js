@@ -10,7 +10,7 @@
  *   docker exec pasco_app node scripts/seed-all-postgres.js
  *
  * Переменные окружения:
- *   DATABASE_URL=postgresql://pasco_user:pasco_password@postgres:5432/pasco_lab_db
+ *   DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE
  */
 
 const fs = require('fs')
@@ -21,19 +21,17 @@ const DATA_DIR = path.join(__dirname, '..', 'data')
 const RU_FILE = path.join(DATA_DIR, 'local-db.ru.json')
 const KY_FILE = path.join(DATA_DIR, 'local-db.ky.json')
 
-const DATABASE_URL =
-  process.env.DATABASE_URL ||
-  'postgresql://pasco_user:pasco_password@postgres:5432/pasco_lab_db'
+const DATABASE_URL = process.env.DATABASE_URL
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'))
 }
 
-function pick(preferred, fallback) {
-  return preferred ?? fallback ?? null
-}
-
 async function main() {
+  if (!DATABASE_URL) {
+    throw new Error('DATABASE_URL is required.')
+  }
+
   console.log('📦 Полный сид данных в PostgreSQL...')
   console.log(`   Подключение: ${DATABASE_URL.replace(/:[^:@]+@/, ':***@')}`)
 
