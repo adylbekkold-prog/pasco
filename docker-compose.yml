@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: pasco-lab-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: pasco_lab_db
       POSTGRES_USER: pasco_user
@@ -25,6 +26,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pasco-lab-pgadmin
+    restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:?Set PGADMIN_DEFAULT_PASSWORD before starting pgAdmin}
