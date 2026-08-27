@@ -221,6 +221,8 @@ pm2 startup systemd -u root --hp /root || true
 # 14. НАСТРОЙКА NGINX
 # ============================================================
 echo "🌐 Настраиваем Nginx..."
+mkdir -p /var/cache/nginx/pasco-lab
+cp scripts/nginx-pasco-lab-cache.conf /etc/nginx/conf.d/pasco-lab-cache.conf
 sed -e "s|__DOMAIN__|${DOMAIN}|g" -e "s|__APP_DIR__|${APP_DIR}|g" \
   scripts/nginx-pasco-lab.conf | tee /etc/nginx/sites-available/pasco-lab-portal >/dev/null
 

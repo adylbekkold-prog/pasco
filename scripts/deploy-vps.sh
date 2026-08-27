@@ -73,6 +73,8 @@ find "$APP_DIR/sparkvue-pwa" -type f \( -name '*.css' -o -name '*.js' -o -name '
 pm2 startOrReload scripts/pm2-ecosystem.config.js --only pasco-lab-portal --update-env
 pm2 save
 
+sudo mkdir -p /var/cache/nginx/pasco-lab
+sudo cp scripts/nginx-pasco-lab-cache.conf /etc/nginx/conf.d/pasco-lab-cache.conf
 sed -e "s|__DOMAIN__|$DOMAIN|g" -e "s|__APP_DIR__|$APP_DIR|g" scripts/nginx-pasco-lab.conf | sudo tee /etc/nginx/sites-available/pasco-lab-portal >/dev/null
 
 sudo ln -sf /etc/nginx/sites-available/pasco-lab-portal /etc/nginx/sites-enabled/

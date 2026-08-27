@@ -1,10 +1,18 @@
+const configuredInstances = Number.parseInt(process.env.PM2_INSTANCES ?? '4', 10)
+const instances =
+  Number.isInteger(configuredInstances) && configuredInstances > 0
+    ? configuredInstances
+    : 4
+
 module.exports = {
   apps: [
     {
       name: 'pasco-lab-portal',
-      script: 'npm',
-      args: 'run start -- --hostname 127.0.0.1 --port 3000',
+      script: 'node_modules/next/dist/bin/next',
+      args: 'start --hostname 127.0.0.1 --port 3000',
       cwd: '/var/www/project1',
+      exec_mode: 'cluster',
+      instances,
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
