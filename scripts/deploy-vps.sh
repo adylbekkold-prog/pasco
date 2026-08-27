@@ -6,7 +6,9 @@ REPO_URL="${REPO_URL:-https://github.com/your-org/pasco-lab-portal.git}"
 BRANCH="${BRANCH:-main}"
 NODE_VERSION="${NODE_VERSION:-20}"
 DOMAIN="${DOMAIN:?Set DOMAIN to the public VPS domain}"
-CERTBOT_EMAIL="${CERTBOT_EMAIL:?Set CERTBOT_EMAIL for Let's Encrypt}"
+DOMAIN_ALIASES="${DOMAIN_ALIASES:-}"
+SERVER_NAMES="$DOMAIN${DOMAIN_ALIASES:+ $DOMAIN_ALIASES}"
+CERTBOT_EMAIL="${CERTBOT_EMAIL:?Set CERTBOT_EMAIL for Lets Encrypt}"
 DATABASE_URL="${DATABASE_URL:?Set DATABASE_URL for PostgreSQL}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:?Set ADMIN_PASSWORD for /sersdp admin panel}"
 ADMIN_SESSION_SECRET="${ADMIN_SESSION_SECRET:?Set ADMIN_SESSION_SECRET for signed admin sessions}"
@@ -75,9 +77,18 @@ pm2 save
 
 sudo mkdir -p /var/cache/nginx/pasco-lab
 sudo cp scripts/nginx-pasco-lab-cache.conf /etc/nginx/conf.d/pasco-lab-cache.conf
-sed -e "s|__DOMAIN__|$DOMAIN|g" -e "s|__APP_DIR__|$APP_DIR|g" scripts/nginx-pasco-lab.conf | sudo tee /etc/nginx/sites-available/pasco-lab-portal >/dev/null
+sed -e "s|__DOMAIN__|$SERVER_NAMES|g" -e "s|__APP_DIR__|$APP_DIR|g" scripts/nginx-pasco-lab.conf | sudo tee /etc/nginx/sites-available/pasco-lab-portal >/dev/null
 
 sudo ln -sf /etc/nginx/sites-available/pasco-lab-portal /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
-sudo certbot --nginx --non-interactive --agree-tos --redirect --email "$CERTBOT_EMAIL" -d "$DOMAIN"
+
+CERTBOT_DOMAIN_ARGS=(-d "$DOMAIN")
+if [ -n "$DOMAIN_ALIASES" ]; then
+  read -r -a CERTBOT_ALIASES <<< "$DOMAIN_ALIASES"
+  for alias in "${CERTBOT_ALIASES[@]}"; do
+    CERTBOT_DOMAIN_ARGS+=(-d "$alias")
+  done
+fi
+
+sudo certbot --nginx --non-interactive --agree-tos --redirect --email "$CERTBOT_EMAIL" "${CERTBOT_DOMAIN_ARGS[@]}"

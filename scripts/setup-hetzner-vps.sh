@@ -20,7 +20,8 @@ set -euo pipefail
 # Файл лежит в Git и попадёт в GitHub. Задай значения через
 # переменные окружения перед запуском скрипта, например:
 #
-#   export DOMAIN=89.167.118.180
+#   export DOMAIN=stem-labs.kg
+#   export DOMAIN_ALIASES="www.stem-labs.kg"
 #   export CERTBOT_EMAIL=you@example.com
 #   export DB_PASSWORD='СЛОЖНЫЙ_ПАРОЛЬ'
 #   export ADMIN_PASSWORD='СЛОЖНЫЙ_ПАРОЛЬ'
@@ -36,6 +37,8 @@ APP_DIR="/var/www/pasco-lab-portal"
 
 # Заполняются из переменных окружения (см. выше). Не хардкодь здесь!
 DOMAIN="${DOMAIN:-}"
+DOMAIN_ALIASES="${DOMAIN_ALIASES:-}"
+SERVER_NAMES="$DOMAIN${DOMAIN_ALIASES:+ $DOMAIN_ALIASES}"
 CERTBOT_EMAIL="${CERTBOT_EMAIL:-}"
 
 DB_NAME="${DB_NAME:-pasco}"
@@ -223,7 +226,7 @@ pm2 startup systemd -u root --hp /root || true
 echo "🌐 Настраиваем Nginx..."
 mkdir -p /var/cache/nginx/pasco-lab
 cp scripts/nginx-pasco-lab-cache.conf /etc/nginx/conf.d/pasco-lab-cache.conf
-sed -e "s|__DOMAIN__|${DOMAIN}|g" -e "s|__APP_DIR__|${APP_DIR}|g" \
+sed -e "s|__DOMAIN__|${SERVER_NAMES}|g" -e "s|__APP_DIR__|${APP_DIR}|g" \
   scripts/nginx-pasco-lab.conf | tee /etc/nginx/sites-available/pasco-lab-portal >/dev/null
 
 ln -sf /etc/nginx/sites-available/pasco-lab-portal /etc/nginx/sites-enabled/
@@ -235,7 +238,15 @@ systemctl reload nginx
 # 15. SSL-СЕРТИФИКАТ (Let's Encrypt)
 # ============================================================
 echo "🔒 Получаем SSL-сертификат..."
-certbot --nginx --non-interactive --agree-tos --redirect --email "$CERTBOT_EMAIL" -d "$DOMAIN" || \
+CERTBOT_DOMAIN_ARGS=(-d "$DOMAIN")
+if [ -n "$DOMAIN_ALIASES" ]; then
+  read -r -a CERTBOT_ALIASES <<< "$DOMAIN_ALIASES"
+  for alias in "${CERTBOT_ALIASES[@]}"; do
+    CERTBOT_DOMAIN_ARGS+=(-d "$alias")
+  done
+fi
+
+certbot --nginx --non-interactive --agree-tos --redirect --email "$CERTBOT_EMAIL" "${CERTBOT_DOMAIN_ARGS[@]}" || \
   echo "⚠️ Не удалось получить SSL (проверь, что домен указывает на этот сервер)"
 
 # ============================================================
