@@ -42,12 +42,14 @@ function getCopy(locale: Locale) {
       }
 }
 
-function getSafePdfUrl(src: string) {
+export function getSafePdfUrl(src: string) {
   const url = new URL(src, window.location.origin)
 
   if (url.origin !== window.location.origin || !url.pathname.toLowerCase().endsWith('.pdf')) {
     throw new Error('Only same-origin PDF files can be opened in the embedded viewer.')
   }
+
+  url.searchParams.set('pdf-viewer', '1')
 
   return url.toString()
 }
