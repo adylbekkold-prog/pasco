@@ -211,6 +211,10 @@ npm run build
 # ============================================================
 echo "🗜️ Сжимаем SPARKvue файлы..."
 find sparkvue-pwa -type f \( -name '*.css' -o -name '*.js' -o -name '*.json' -o -name '*.wasm' \) -exec gzip -9 -k -f {} \; 2>/dev/null || true
+if [ -d public/uploads ]; then
+  find public/uploads -type d -exec chmod 755 {} \;
+  find public/uploads -type f -exec chmod 644 {} \;
+fi
 
 # ============================================================
 # 13. ЗАПУСК ЧЕРЕЗ PM2

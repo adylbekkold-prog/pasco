@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { chmod, mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import slugify from 'slugify'
 import { NextResponse } from 'next/server'
@@ -8,7 +8,10 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const UPLOAD_ROOT = path.join(process.cwd(), 'public', 'uploads', 'labs')
+const PUBLIC_UPLOADS_ROOT = path.dirname(UPLOAD_ROOT)
 const DEFAULT_MAX_UPLOAD_BYTES = 100 * 1024 * 1024
+const PUBLIC_UPLOAD_DIR_MODE = 0o755
+const PUBLIC_UPLOAD_FILE_MODE = 0o644
 
 const ALLOWED_EXTENSIONS = new Set([
   '.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp', '.avif',
@@ -35,6 +38,30 @@ const ALLOWED_MIME_TYPES = new Map<string, Set<string>>([
 
 function sanitizeSegment(value: string) {
   return slugify(value, { lower: true, strict: true }) || 'upload'
+}
+
+function isMissingPathError(error: unknown) {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: unknown }).code === 'ENOENT'
+  )
+}
+
+async function chmodIfExists(filePath: string, mode: number) {
+  try {
+    await chmod(filePath, mode)
+  } catch (error) {
+    if (!isMissingPathError(error)) throw error
+  }
+}
+
+async function preparePublicUploadDirectory(targetDir: string) {
+  await mkdir(targetDir, { recursive: true, mode: PUBLIC_UPLOAD_DIR_MODE })
+  await chmodIfExists(PUBLIC_UPLOADS_ROOT, PUBLIC_UPLOAD_DIR_MODE)
+  await chmodIfExists(UPLOAD_ROOT, PUBLIC_UPLOAD_DIR_MODE)
+  await chmodIfExists(targetDir, PUBLIC_UPLOAD_DIR_MODE)
 }
 
 function getSafeFileName(fileName: string) {
@@ -169,8 +196,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Недопустимый путь.' }, { status: 400 })
   }
 
-  await mkdir(targetDir, { recursive: true })
-  await writeFile(targetPath, Buffer.from(fileBytes))
+  await preparePublicUploadDirectory(targetDir)
+  await writeFile(targetPath, Buffer.from(fileBytes), { mode: PUBLIC_UPLOAD_FILE_MODE })
+  await chmodIfExists(targetPath, PUBLIC_UPLOAD_FILE_MODE)
 
   return NextResponse.json({
     url: `/uploads/labs/${scope}/${fileName}`,

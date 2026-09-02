@@ -71,6 +71,10 @@ upsert_env NEXT_PUBLIC_SITE_URL "https://$DOMAIN"
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/sql/2026-07-09_postgresql_schema.sql
 npm run build
 find "$APP_DIR/sparkvue-pwa" -type f \( -name '*.css' -o -name '*.js' -o -name '*.json' -o -name '*.wasm' \) -exec gzip -9 -k -f {} \;
+if [ -d "$APP_DIR/public/uploads" ]; then
+  find "$APP_DIR/public/uploads" -type d -exec chmod 755 {} \;
+  find "$APP_DIR/public/uploads" -type f -exec chmod 644 {} \;
+fi
 
 pm2 startOrReload scripts/pm2-ecosystem.config.js --only pasco-lab-portal --update-env
 pm2 save

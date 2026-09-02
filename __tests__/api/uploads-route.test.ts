@@ -1,8 +1,10 @@
 /** @jest-environment node */
 
+import { chmod, mkdir, writeFile } from 'node:fs/promises'
 import { POST } from '@/app/api/uploads/route'
 
 jest.mock('node:fs/promises', () => ({
+  chmod: jest.fn().mockResolvedValue(undefined),
   mkdir: jest.fn().mockResolvedValue(undefined),
   writeFile: jest.fn().mockResolvedValue(undefined),
 }))
@@ -23,6 +25,10 @@ function createUploadRequest(file: File) {
 }
 
 describe('uploads API route', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('rejects SVG uploads', async () => {
     const file = new File(['<svg><script>alert(1)</script></svg>'], 'attack.svg', {
       type: 'image/svg+xml',
@@ -67,5 +73,27 @@ describe('uploads API route', () => {
 
     expect(response.status).toBe(200)
     expect(body.url).toMatch(/\/uploads\/labs\/test\/activity-\d+\.spklab/)
+  })
+
+  it('stores public uploads with web-readable directory and file permissions', async () => {
+    const file = new File(['%PDF-1.7\n'], 'worksheet.pdf', {
+      type: 'application/pdf',
+    })
+
+    const response = await POST(createUploadRequest(file))
+
+    expect(response.status).toBe(200)
+    expect(mkdir).toHaveBeenCalledWith(expect.stringContaining('test'), {
+      mode: 0o755,
+      recursive: true,
+    })
+    expect(chmod).toHaveBeenCalledWith(expect.stringContaining('public'), 0o755)
+    expect(chmod).toHaveBeenCalledWith(expect.stringContaining('test'), 0o755)
+    expect(writeFile).toHaveBeenCalledWith(
+      expect.stringMatching(/worksheet-\d+\.pdf$/),
+      expect.any(Buffer),
+      { mode: 0o644 }
+    )
+    expect(chmod).toHaveBeenCalledWith(expect.stringMatching(/worksheet-\d+\.pdf$/), 0o644)
   })
 })
